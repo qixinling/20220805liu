@@ -9,9 +9,9 @@ if (process.env.NODE_ENV === "development") {
 	ws_url = "ws://localhost:";
 } else if (process.env.NODE_ENV === "production") {
 	//生产环境
-	send_url = "http://www.hnbc168.com/";
+	send_url = "http://20220805liu.gxyhttest.com/";
 	img_url = send_url + "Upload/";
-	ws_url = "ws://www.hnbc168.com:";
+	ws_url = "ws://20220805liu.gxyhttest.com:";
 }
 
 var ImgRatio = {
