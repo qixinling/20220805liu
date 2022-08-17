@@ -1,0 +1,17 @@
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\nlog.config
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.Utils.deps.json
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.Utils.dll
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.Utils.pdb
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.Logs.dll
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.Models.dll
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.MysqlUtils.dll
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.Logs.pdb
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.Models.pdb
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\bin\Debug\netcoreapp3.1\Server.MysqlUtils.pdb
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\obj\Debug\netcoreapp3.1\Server.Utils.csprojAssemblyReference.cache
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\obj\Debug\netcoreapp3.1\Server.Utils.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\obj\Debug\netcoreapp3.1\Server.Utils.AssemblyInfo.cs
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\obj\Debug\netcoreapp3.1\Server.Utils.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\obj\Debug\netcoreapp3.1\Server.Utils.csproj.CopyComplete
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\obj\Debug\netcoreapp3.1\Server.Utils.dll
+C:\Users\Admin\Desktop\project\qixinling622\Server\Server.Utils\obj\Debug\netcoreapp3.1\Server.Utils.pdb

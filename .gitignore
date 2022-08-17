@@ -1,0 +1,6 @@
+/publish
+/Server/Server.Api/wwwroot/Upload
+/Server/Server.Utils.Private
+/Server/Server.BonusUtils
+/Server/Server.MysqlUtils
+/Server/Server.Bill.Utils/obj

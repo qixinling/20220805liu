@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+	<meta http-equiv="expires" content="0">
+	<title>下载APP</title>
+	<style>
+		.container {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 100%;
+			height: 100%;
+			background-image: url("img/app-bg.png");
+			background-size: 100% 100%;
+		}
+
+		.logo-container{
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.logo {
+			position: absolute;
+			top: 8vh;
+			width: 12vh;
+			height: 12vh;
+		}
+
+		.title {
+			position: absolute;
+			top: 14vh;
+			width: 100%;
+			text-align: center;
+			color: #F1B22A;
+			font-size: 2vh;
+		}
+		.btn-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+		}
+		.btn-ios{
+			position: absolute;
+			bottom: 3vh;
+		}
+		.btn-android{
+			position: absolute;
+			bottom: 10vh;
+		}
+		.btn-ios-img,
+		.btn-android-img{
+			width: 30vh;
+		}
+		
+		.footer-bg{
+			padding: 20px;
+			background-color: rgba(0,0,0,0.9);
+			position: absolute;
+			top: 20px;
+			left: 20px;
+			right: 20px;
+			border-radius: 10px;
+			z-index: 999;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div id="weixin-tip" style="display: none;" class="footer-bg">
+			<img src="img/app-live_weixin.png" style="width:100%" alt="微信打开" />
+			<p style="color: #DDDDDD;">微信用户请在右上角选择“在浏览器中打开”，再选择下载应用</p>
+		</div>
+		<!-- <div class="logo-container">
+			<img class="logo" src="./img/logo.png">
+		</div> -->
+		<div class="btn-container">
+			<a class="btn-android" href="#" onclick="download_Android('http://122.51.141.221/20220627liu/com.hnbc.apk')">
+				<img class="btn-android-img" src="img/app-android-btn.png" alt="安卓版下载">
+			</a>
+			<a class="btn-ios" >
+				<img class="btn-ios-img" src="img/app-ios-btn.png" alt="苹果版下载">
+			</a>
+			
+		</div>
+	</div>
+	<script type="text/javascript">
+		function download_Android(url) {
+			var ua = navigator.userAgent.toLowerCase();
+			if (ua.match(/MicroMessenger/i) == "micromessenger") {
+				//alert('微信浏览器不支持下载,请步骤使用手机浏览器下载');
+				document.getElementById("weixin-tip").style.display = "";
+			} else {
+				window.location.href = url;
+			}
+		}
+	</script>
+</body>
+
+</html>
