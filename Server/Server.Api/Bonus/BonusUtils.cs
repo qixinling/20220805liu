@@ -42,6 +42,114 @@ namespace Server.Bonus
         }
 
         /// <summary>
+        /// 计算级差
+        /// </summary>
+        /// <param name="yid">会员绑定画室长的id</param>
+        /// <param name="jine">会员上架画的价格</param>
+        public static void JiCha(int yid, decimal jine)
+        {
+            /*
+             *初级    0.5%
+             *中一级  0.6%
+             *中二级  0.8%
+             *中三级  1%
+             *高级    1.2%
+            */
+            try
+            {
+                using DbConnect _dbConnect = DbConnectUtils.GetDbContext();
+                DbUsers yus = _dbConnect.DbUsers.FirstOrDefault(u => u.Id == yid && u.Xlevel >= 1);
+                if (yus != null)
+                {
+                    decimal bl = 0;
+                    switch (yus.Xlevel)
+                    {
+                        case 1:
+                            bl = (decimal)0.5;
+                            break;
+                        case 2:
+                            bl = (decimal)0.6;
+                            break;
+                        case 3:
+                            bl = (decimal)0.8;
+                            break;
+                        case 4:
+                            bl = 1;
+                            break;
+                        case 5:
+                            bl = (decimal)1.2;
+                            break;
+                    }
+                    DbUsers lastUs = yus;
+                    List<DbUsers> usList = _dbConnect.DbUsers.Where(u => EF.Functions.Like(yus.Repath, "%," + u.Id + ",%") && u.Xlevel > yus.Xlevel).OrderByDescending(u => u.Relevel).ToList();
+                    foreach (var us in usList)
+                    {
+                        if (us.Xlevel > lastUs.Xlevel)
+                        {
+                            decimal bili = 0;
+                            switch (us.Xlevel)
+                            {
+                                case 1:
+                                    bili = (decimal)0.5;
+                                    break;
+                                case 2:
+                                    bili = (decimal)0.6;
+                                    break;
+                                case 3:
+                                    bili = (decimal)0.8;
+                                    break;
+                                case 4:
+                                    bili = 1;
+                                    break;
+                                case 5:
+                                    bili = (decimal)1.2;
+                                    break;
+                            }
+
+                            decimal amount = jine * (bili - bl) / 100;
+
+                            //生成打款记录
+                            DbJichaDakuan jichaDakuan = new DbJichaDakuan
+                            {
+                                Uid = lastUs.Id,
+                                Userid = lastUs.Userid,
+                                Username = lastUs.Username,
+                                Jine = amount,
+                                Suid = us.Id,
+                                Suserid = us.Userid,
+                                Susername = us.Username,
+                                Cdate = DateTime.Now
+                            };
+
+                            _dbConnect.DbJichaDakuan.Add(jichaDakuan);
+
+                            bl = bili;
+                            lastUs = us;
+                        }
+                    }
+
+                    //结束后强制写入一条平台的记录,平台拿2%
+                    _dbConnect.DbJichaDakuan.Add(new DbJichaDakuan
+                    {
+                        Uid = lastUs.Id,
+                        Userid = lastUs.Userid,
+                        Username = lastUs.Username,
+                        Jine = jine * (2 - bl) / 100,
+                        Suid = 1,
+                        Suserid = "平台",
+                        Susername = "平台",
+                        Cdate = DateTime.Now
+                    });
+                }
+                _dbConnect.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                NLogHelper._.Error("计算级差异常", ex);
+            }
+        }
+
+        /// <summary>
         /// 奖金发放
         /// </summary>
         /// <returns></returns>
