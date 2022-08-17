@@ -18,6 +18,8 @@ using Server.Bonus.Utils;
 using StackExchange.Redis;
 using Server.Api.Utils;
 using System.Threading;
+using Server.Wallet.Utils;
+using Server.Bill.Utils;
 
 namespace Server.Api.Controllers.ShopControllers.HoldControllers
 {
@@ -79,6 +81,10 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 }
                 if (dbHold == null) { return _res.Fail("该预约已满"); }
 
+                decimal yajin = 200;
+                DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c => c.Uid == us.Id && c.Cid == 1);
+                if(uw.Jine < yajin) { return _res.Fail("画贝余额不足"); }
+
                 do
                 {
                     using DbConnect dbConnect = DbConnectUtils.GetDbContext();
@@ -97,6 +103,18 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         dbHold.Qgdate = DateTime.Now;
                         dbHold.Isyy = 1;
                         dbHold.Pid = pid;
+                        dbHold.Hbjine = 500;
+                        dbHold.Yajin = yajin;
+
+                        Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, _dbConnect);
+                        if (res.Code == 0) { break; }
+                        IBill bill = new BillPay();
+                        bill.Create(us.Id, new Dictionary<int, decimal>{{1,yajin}}, _dbConnect, "冻结", 0);
+
+                        res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
+                        bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, _dbConnect, "冻结", 0);
+                        if (res.Code == 0) { break; }
+
                         break;
                     }
                     else
@@ -160,7 +178,11 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 //if (hold.Userid.Equals(userid)) { return _res.Fail("不可与自己卖单交易"); }
                 if (hold.State != 0) { return _res.Fail("该单已售出"); }
                 if (hold.Isdelete != 0) { return _res.Fail("该单已删除"); }
-               
+
+                decimal yajin = 200;
+                DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c => c.Uid == us.Id && c.Cid == 1);
+                if (uw.Jine < yajin) { return _res.Fail("画贝余额不足"); }
+
                 do
                 {
                     using DbConnect dbConnect = DbConnectUtils.GetDbContext();
@@ -170,14 +192,23 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     if(dbConnect.Database.ExecuteSqlRaw($"update `db_hold` set version='{$"{DateTime.Now.Ticks}{r.Next(10000, 99999)}"}' where id={hid} and version='{hold.Version}'") == 1)
                     {
                         us.Lsk += hold.Jprice;
-
-
                         hold.State = 1;
                         hold.Buid = us.Id;
                         hold.Buserid = us.Userid;
                         hold.Busername = us.Username;
                         hold.Busertel = us.Usertel;
                         hold.Qgdate = DateTime.Now;
+                        hold.Hbjine = 500;
+                        hold.Yajin = yajin;
+
+                        Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, dbConnect);
+                        if (res.Code == 0) { break; }
+                        IBill bill = new BillPay();
+                        bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+
+                        res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
+                        bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+                        if (res.Code == 0) { break; }
                         break;
                     }
                     else
@@ -226,17 +257,12 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 int pagecount = 0;
                 DbSite site = _dbConnect.DbSite.FirstOrDefault(c => c.Id == 2 && c.Ispay == 1);//开抢的时段
                 int week = (int)DateTime.Now.DayOfWeek;
-                if(week == 0)
-                {
-                    week = 7;
-                }
-                if (site != null && week >= 3 && week <= 7)
-                {
-                    hlist = _dbConnect.DbHold.Where(c => c.State == 0 && c.Isfc == 0 && (DateTime.Now.Date > c.Sjdate.Date || c.Issd == 1 || c.Iscf ==1) && c.Hsuid == us.Mystudioid &&  c.Isdelete == 0).OrderByDescending(c => c.Jprice).ToList();
+                
+                hlist = _dbConnect.DbHold.Where(c => c.State == 0 && c.Isfc == 0 && (DateTime.Now.Date > c.Sjdate.Date || c.Issd == 1 || c.Iscf ==1) && c.Hsuid == us.Mystudioid &&  c.Isdelete == 0).OrderByDescending(c => c.Jprice).ToList();
 
-                    pagecount = (int)Math.Ceiling((float)hlist.Count / pageSize);
-                    hlist = hlist.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
-                }
+                pagecount = (int)Math.Ceiling((float)hlist.Count / pageSize);
+                hlist = hlist.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
+                
                 _res.Done(new { week, hlist, pagecount }, "查询成功");
             }
             catch (Exception ex)
@@ -526,7 +552,15 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
 
                 hold.State = 3;
                 hold.Skdate = DateTime.Now;
-               // hold.Edate = DateTime.Now.AddHours(24);
+
+                //Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, hold.Yajin, dbConnect);
+                //if (res.Code == 0) { break; }
+                //IBill bill = new BillPay();
+                //bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+
+                //res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
+                //bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+                //if (res.Code == 0) { break; }
 
                 _dbConnect.SaveChanges();
                 _res.Done(null, "您已收款，交易成功");

@@ -27,6 +27,7 @@ namespace Server.Models.DataBaseModels
         public virtual DbSet<DbHelp> DbHelp { get; set; }
         public virtual DbSet<DbHold> DbHold { get; set; }
         public virtual DbSet<DbJewellery> DbJewellery { get; set; }
+        public virtual DbSet<DbJichaDakuan> DbJichaDakuan { get; set; }
         public virtual DbSet<DbMsg> DbMsg { get; set; }
         public virtual DbSet<DbNews> DbNews { get; set; }
         public virtual DbSet<DbPricerange> DbPricerange { get; set; }
@@ -75,7 +76,7 @@ namespace Server.Models.DataBaseModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySql("server=101.33.117.78;user id=20220627liu_gxyh;password=6jr3NMkmRTcn7Ywa;database=20220627liu_gxyh", Microsoft.EntityFrameworkCore.ServerVersion.Parse("5.7.37-mysql"));
+                optionsBuilder.UseMySql("server=43.154.170.212;user id=20220805liu_gxyh;password=SXyhBNrER8FCwfzY;database=20220805liu_gxyh", Microsoft.EntityFrameworkCore.ServerVersion.Parse("5.7.39-mysql"));
             }
         }
 
@@ -453,6 +454,10 @@ namespace Server.Models.DataBaseModels
                     .HasColumnType("datetime")
                     .HasColumnName("edate");
 
+                entity.Property(e => e.Hbjine)
+                    .HasPrecision(18, 2)
+                    .HasColumnName("hbjine");
+
                 entity.Property(e => e.Hdate)
                     .HasColumnType("datetime")
                     .HasColumnName("hdate")
@@ -605,6 +610,10 @@ namespace Server.Models.DataBaseModels
                     .HasColumnName("version")
                     .HasDefaultValueSql("''");
 
+                entity.Property(e => e.Yajin)
+                    .HasPrecision(18, 2)
+                    .HasColumnName("yajin");
+
                 entity.Property(e => e.Zhimg)
                     .HasMaxLength(255)
                     .HasColumnName("zhimg");
@@ -692,6 +701,71 @@ namespace Server.Models.DataBaseModels
                     .HasPrecision(18, 2)
                     .HasColumnName("sybili")
                     .HasComment("收益比例");
+            });
+
+            modelBuilder.Entity<DbJichaDakuan>(entity =>
+            {
+                entity.ToTable("db_jicha_dakuan");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Cdate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("cdate")
+                    .HasComment("创建时间");
+
+                entity.Property(e => e.Ddate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("ddate")
+                    .HasComment("打款时间");
+
+                entity.Property(e => e.Dkimg)
+                    .HasMaxLength(255)
+                    .HasColumnName("dkimg")
+                    .HasComment("打款图片");
+
+                entity.Property(e => e.Jine)
+                    .HasPrecision(18, 2)
+                    .HasColumnName("jine")
+                    .HasComment("打款金额");
+
+                entity.Property(e => e.Liushuihao)
+                    .HasMaxLength(255)
+                    .HasColumnName("liushuihao")
+                    .HasComment("流水号");
+
+                entity.Property(e => e.State)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("state")
+                    .HasComment("0=等待打款,1=已打款,2=预留(可能会出现需要申诉");
+
+                entity.Property(e => e.Suid)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("suid")
+                    .HasComment("收款人");
+
+                entity.Property(e => e.Suserid)
+                    .HasMaxLength(255)
+                    .HasColumnName("suserid");
+
+                entity.Property(e => e.Susername)
+                    .HasMaxLength(255)
+                    .HasColumnName("susername");
+
+                entity.Property(e => e.Uid)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("uid")
+                    .HasComment("打款人");
+
+                entity.Property(e => e.Userid)
+                    .HasMaxLength(255)
+                    .HasColumnName("userid");
+
+                entity.Property(e => e.Username)
+                    .HasMaxLength(255)
+                    .HasColumnName("username");
             });
 
             modelBuilder.Entity<DbMsg>(entity =>

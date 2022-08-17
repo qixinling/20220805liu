@@ -56,5 +56,7 @@ namespace Server.Models.DataBaseModels
         public int Isyy { get; set; }
         public int Pid { get; set; }
         public int Issd { get; set; }
+        public decimal Hbjine { get; set; }
+        public decimal Yajin { get; set; }
     }
 }
