@@ -31,7 +31,7 @@
 					<el-table-column prop="recount" label-class-name="recount" label="推荐人数" width="100"></el-table-column>
 					<el-table-column prop="teamcount" label-class-name="teamcount" label="团队人数" width="100"></el-table-column>
 					<el-table-column prop="teamyeji" label-class-name="teamyeji" label="团队业绩" width="100"></el-table-column>
-					
+					<el-table-column prop="riteamyeji" label-class-name="riteamyeji" label="今日团队业绩" width="100"></el-table-column>
 					<el-table-column prop="islockname" label-class-name="islockname" label="状态" width="100"></el-table-column>
 					
 					<el-table-column label="资料">

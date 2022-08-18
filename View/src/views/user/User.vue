@@ -2,15 +2,19 @@
     <div>
         <div class="hader-nav">个人中心</div>
         <div class="user-block">
-            <div class="wallet">
-                <div>余额</div>
-                <div style="color:#ff4500">{{walletJine}}</div>
-                <div class="wallet-tixian-btn" @click="tolink('tixian')">提现</div>
-            </div>
+            
             <div class="user-info">
                 <img :src="usinfo.tx" width="70" height="70" style="border-radius:8px" />
                 <div style="margin-top:4px">{{ usinfo.userid }}</div>
             </div>
+			<div class="wallet">
+			    <div>画贝</div>
+			    <div style="color:#ff4500">{{walletJine}}</div>
+				<div style="display: flex;justify-content: center;">
+					<div class="wallet-tixian-btn" @click="tolink('Chongzhi')">充值</div>
+					<div class="wallet-tixian-btn" style="margin-left: 10px;" @click="tolink('tixian')">提现</div>
+				</div>
+			</div>
         </div>
         <div class="order-block">
             <div class="order-header">
@@ -46,7 +50,7 @@
                 <!-- <van-cell title="提货订单" icon="gift-o" is-link to="Tihuo" value="" />
                 <van-cell title="商城订单" icon="shop-o" is-link to="Order" value="" /> -->
                 <van-cell title="安全中心" icon="bulb-o" is-link to="Safe" value="" />
-                <!-- <van-cell title="新闻公告" icon="newspaper-o" is-link to="News" value="" /> -->
+                <van-cell title="申请画室" icon="newspaper-o" is-link to="Shengji" value="" />
                 <!-- <van-cell title="我的团队" icon="friends-o " value="" is-link to="./Tree" /> -->
                 <van-cell title="邀请好友" icon="qr" is-link :to="'./Qrcode?recode=' + usinfo.recode +'&usertel=' + usinfo.usertel +'&tx=' +usinfo.tx" />
                 <van-cell title="绑定信息" icon="setting-o" is-link to="UserInfo" value="" />
@@ -348,14 +352,14 @@ export default {
     padding: 20px 0;
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* justify-content: center; */
     color: #fff;
     background-color: #012d17;
 }
 
 .wallet {
     position: absolute;
-    left: 10%;
+    right: 10%;
     font-size: 14px;
     font-weight: 500;
 }
@@ -373,7 +377,8 @@ export default {
 
 .user-info {
     font-size: 14px;
-    text-align: center;
+    padding-left: 30px;
+	text-align: center;
 }
 
 .order-block {

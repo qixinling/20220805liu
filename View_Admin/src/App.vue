@@ -58,6 +58,8 @@
                         </el-menu-item>
 						<el-menu-item index="Teachers" v-if="permissionChildren('Teachers_Admin/List')">画家列表
 						</el-menu-item>
+						<el-menu-item index="UlevelupRecord" v-if="permissionChildren('UsersLevelup_Admin/List')">画室长申请列表
+						</el-menu-item>
 					
                     </el-submenu>
                     <el-submenu index="3" v-if="permission('奖金管理')">

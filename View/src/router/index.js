@@ -19,6 +19,7 @@ const routes = [{
 			title: "首页"
 		}
 	},
+	
 	{
 		path: "/ShopIndex",
 		name: "ShopIndex",
@@ -427,6 +428,38 @@ const routes = [{
 		component: resolve => require(["@/views/wallet/Buy"], resolve),
 		meta: {
 			title: "购买星座"
+		}
+	},
+	{
+		path: "/Shengji",
+		name: "Shengji",
+		component: resolve => require(["@/views/auction/Shengji"], resolve),
+		meta: {
+			title: "申请画室"
+		}
+	},
+	{
+		path: "/Details",
+		name: "Details",
+		component: resolve => require(["@/views/auction/Details"], resolve),
+		meta: {
+			title: "详情"
+		}
+	},
+	{
+		path: "/Dakuan",
+		name: "Dakuan",
+		component: resolve => require(["@/views/auction/Dakuan"], resolve),
+		meta: {
+			title: "打款"
+		}
+	},
+	{
+		path: "/Shoukuan",
+		name: "Shoukuan",
+		component: resolve => require(["@/views/auction/Shoukuan"], resolve),
+		meta: {
+			title: "收款"
 		}
 	},
 	{

@@ -13,6 +13,7 @@ using Server.Logs;
 using static Server.Api.Filters;
 using Newtonsoft.Json.Linq;
 using Server.Api.Level;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.Api.Controllers.UsersControllers.LevelupControllers
 {
@@ -26,6 +27,73 @@ namespace Server.Api.Controllers.UsersControllers.LevelupControllers
         {
             _dbConnect = dbConnect;
             _res = res;
+        }
+
+        /// <summary>
+        /// 删除升级记录
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TokenAdminCheckFilters]
+        [PermissionCheckFilters]
+        [SignCheckFilters]
+        public Result Pass(JObject data)
+        {
+
+            try
+            {
+                string userid_admin = data["userid_admin"].ToString();
+                string ids = data["ids"].ToString();
+
+                List<DbUsersLevelup> uplist = _dbConnect.DbUsersLevelup.Include(c=>c.UidNavigation).Where(u => EF.Functions.Like(ids, "%," + u.Id + ",%")).ToList();
+                foreach (DbUsersLevelup up in uplist)
+                {
+                    if(up.Ylevel == 0)
+                    {
+                        up.UidNavigation.Mystudioid = up.UidNavigation.Id;
+                        up.UidNavigation.Mystudioname = up.UidNavigation.Userid;
+    
+                        List<DbUsers> ulist = _dbConnect.DbUsers.Where(c => EF.Functions.Like(c.Repath, "%," + up.UidNavigation.Id + ",%")).ToList();
+                        foreach (DbUsers us in ulist)
+                        {
+
+                            us.Mystudioid = up.UidNavigation.Id;
+                            us.Mystudioname = up.UidNavigation.Userid;
+                            List<DbHold> hlist = _dbConnect.DbHold.Where(c=>c.Uid == us.Id).ToList();
+                            foreach (DbHold hold in hlist)
+                            {
+                                if(hold.Hsuid != hold.Oldhsuid)//记录前画室id
+                                {
+                                    hold.Oldhsuid = hold.Hsuid;
+                                }
+                                hold.Hsuid = up.UidNavigation.Id;
+                            }
+                        } 
+                    }
+                    else
+                    {
+                        up.UidNavigation.Ylevel = up.UidNavigation.Ulevel;
+                        up.UidNavigation.Ulevel = up.Level;
+                       
+                    }
+
+                    up.State = 1;
+                }
+               
+                _dbConnect.SaveChanges();
+                _res.Done(null, "通过审核");
+
+                SystemLogMethod.Add(userid_admin, HttpInfoUtils.GetIP(), 1, "审核画室申请");
+
+            }
+            catch (Exception ex)
+            {
+                _res.Error("删除升级记录异常");
+
+                NLogHelper._.Error(_res.Msg, ex);
+            }
+            return _res;
         }
 
         /// <summary>
@@ -67,6 +135,8 @@ namespace Server.Api.Controllers.UsersControllers.LevelupControllers
             }
             return _res;
         }
+
+
 
         /// <summary>
         /// 删除升级记录

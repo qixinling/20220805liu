@@ -44,132 +44,62 @@ namespace Server.Api.Controllers.UsersControllers.LevelupControllers
 
             try
             {
+                int uid = Convert.ToInt32(data["uid"]);
                 string userid = Convert.ToString(data["userid"]);
                 if (RepeatedCheckUtils.Rc(userid, 2)) { _res.Fail("请勿重复提交"); return _res; }
 
-                int ulevel = Convert.ToInt32(data["ulevel"]);
-                List<Dictionary<string, string>> diclist = new List<Dictionary<string, string>>();
+                int newulevel = Convert.ToInt32(data["newulevel"]);
 
-                using var transaction = _dbConnect.Database.BeginTransaction();
+                DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Id == uid);
+                if(us == null) { return _res.Fail("用户信息有误"); }
 
-                WalletsCoinMethod wcm = new WalletsCoinMethod(_dbConnect);
-                List<DbWalletsCoin> clist =wcm.GetList();
-                if (clist.Count() < 1) { _res.Fail("货币信息错误"); return _res; }
+                if(us.Ulevel > newulevel) { return _res.Fail("请申请大于自己的级别"); }
 
-                //升级的时候暂时定死货币id
-               
-                DbWallets uw = _dbConnect.DbWallets.Include(u => u.UidNavigation).FirstOrDefault(u => u.Userid.Equals(userid) && u.Cid == clist[1].Id);
-                if (uw == null) { _res.Fail("钱包信息错误"); return _res; }
+                if(_dbConnect.DbUsersLevelup.FirstOrDefault(c=>c.Uid == uid && c.State == 0) != null) { return _res.Fail("当前有申请未审核,请勿重复申请"); }
 
-
-                if (uw.UidNavigation.Ulevel >= ulevel) { _res.Fail("您的级别大于升级级别,请勿重复升级"); return _res; }
-
-                SystemSettingBonusMethod ssbm = new SystemSettingBonusMethod(_dbConnect);
-
-                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
-
-                decimal Lsk = bonusDic["lsk" + ulevel];
-                
-                decimal Cha = Lsk - uw.UidNavigation.Lsk;
-
-                if (Cha <= 0) { _res.Fail("差额错误,该账户无法升级,请联系管理员"); return _res; }
-
-                if (uw.Jine < Cha) { _res.Fail("您的余额不足,请充值"); return _res; }
-
-                List<DbSystemSettingBonus> systemSettingBonusList = ssbm.GetList();
-                foreach (DbSystemSettingBonus systemSettingBonus in systemSettingBonusList)
+                bool ispay = false;
+                if(newulevel == 1 && us.Recount >= 3 && us.Teamcount >= 15 && us.Riteamyeji >= 100000)
                 {
-                    switch (systemSettingBonus.Code)
-                    {
-                        case "yeji1":
-                            systemSettingBonus.Value += Cha;
-                            break;
-                        case "yeji2":
-                            systemSettingBonus.Value += Cha;
-                            break;
-                        case "yeji3":
-                            systemSettingBonus.Value += Cha;
-                            break;
-                    }
+                    ispay = true;
                 }
+                if (newulevel == 2 &&  us.Riteamyeji >= 200000)
+                {
+                    ispay = true;
+                }
+                if (newulevel == 3 &&  us.Riteamyeji >= 500000)
+                {
+                    ispay = true;
+                }
+                if (newulevel == 4 &&  us.Riteamyeji >= 1000000)
+                {
+                    ispay = true;
+                }
+                if (newulevel == 5  && us.Riteamyeji >= 2000000)
+                {
+                    ispay = true;
+                }
+
+                if (!ispay) { return _res.Fail("申请级别条件未达到"); }
 
                 DbUsersLevelup sj = new DbUsersLevelup
                 {
                     Userid = userid,
-                    Username = uw.UidNavigation.Username,
-                    Uid = uw.Uid,
-                    Ylevel = uw.UidNavigation.Ulevel,
-                    Level = ulevel,
-                    Jine = Cha,
+                    Username = us.Username,
+                    Uid = us.Id,
+                    Ylevel = us.Ulevel,
+                    Level = newulevel,
+                    Jine = us.Riteamyeji,
                     Sdate = DateTime.Now,
-                    State = 1
+                    State = 0
                 };
+               _dbConnect.DbUsersLevelup.Add(sj);
+                _res.Done(null, "申请成功");
 
-                uw.UidNavigation.Ulevel = ulevel;
-                uw.UidNavigation.Ylevel = ulevel;
-
-                uw.UidNavigation.Lsk += Cha;
-
-                UsersLevelupMethod ulm = new UsersLevelupMethod( _dbConnect );
-                ulm.Add(sj);
-
-                Result res = WalletsUtils.UpdateBalance(uw.Uid, uw.Cid, Cha, _dbConnect);
-                if (res.Code == 0) { return res; }
-
-                //创建账单
-                IBill bill = new BillPay();
-                bill.Create(uw.Uid, new Dictionary<int, decimal>
-                    {
-                        {uw.Cid,Cha}
-                    }, _dbConnect,"升级");
-
-                _dbConnect.SaveChanges();
-                transaction.Commit();
-
-                //业绩统计
-                YejiUtils ym = new YejiUtils(_dbConnect);
-                ym.AddUser(0, Cha);
-
-                //尾部参数0为首次激活,升级页面,购物页面传1
-
-
-
-                UsersUtils.AddReteamYeji(uw.UidNavigation.Reid, uw.UidNavigation.Repath, Cha, 0, 1);
-                UsersFteamMethod ufm = new UsersFteamMethod(_dbConnect);
-                DbUsersFteam uf =ufm.GetByUid(uw.UidNavigation.Id);
-                if (uf != null)
-                {
-                    //尾部参数0为首次激活,升级页面,购物页面传1
-                    UsersUtils.AddFteamYeji(uf.Ftreeplace, uf.Fpath, Cha, 1);
-                }
-
-                //异步执行对碰,防止未结算完成时其他激活行为触发该函数
-                //判断有没有挂起,挂起时不触发
-                if (RepeatedCheckUtils.GetCacheValue("b6bonus") == null)
-                {
-                    Task.Run(() =>
-                    {
-                            //挂起5秒,期间内收到的任何请求都不会触发挂起
-                            RepeatedCheckUtils.SetChacheValue("b6bonus", "b6bonus", 5);
-                            //5秒后执行
-                            Thread.Sleep(5000);
-                    });
-                }
-
-                _res.Done(null, "升级成功");
-
-
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                List<Ulevel> uLevelList = new Ulevel().GetLevels();
-                dic.Add("newulevel", ulevel.ToString());
-                dic.Add("newulevelname", uLevelList[ulevel].Name);
-                diclist.Add(dic);
-                _res.Done(diclist, "升级成功");
 
             }
             catch (Exception ex)
             {
-                _res.Error("申请升级异常");
+                _res.Error("申请异常");
 
                 NLogHelper._.Error(_res.Msg, ex);
             }
@@ -183,14 +113,15 @@ namespace Server.Api.Controllers.UsersControllers.LevelupControllers
         [HttpPost]
         [TokenCheckFilters]
         [SignCheckFilters]
-        public Result List()
+        public Result List(JObject data)
         {
 
             try
             {
-                UsersLevelupMethod ulm = new UsersLevelupMethod(_dbConnect);
+                int uid = Convert.ToInt32(data["uid"]);
+
                 List<Ulevel> uLevelList = new Ulevel().GetLevels();
-                var uulist = ulm.GetList().OrderByDescending(u => u.Id).Select(u => new
+                var uulist = _dbConnect.DbUsersLevelup.Where(c=>c.Uid == uid).OrderByDescending(u => u.Id).Select(u => new
                 {
                     u.Userid,
                     u.Username,

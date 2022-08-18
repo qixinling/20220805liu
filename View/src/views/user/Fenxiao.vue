@@ -8,7 +8,7 @@
                     <div style="font-size:16px;margin-bottom:5px">{{usinfo.userid}}</div>
                     <div>推荐人：{{usinfo.rename}}</div>
                     <div v-if="usinfo.ulevel == 0">会员【{{usinfo.ulevelname}}】</div>
-                    <div v-if="usinfo.ulevel == 1">{{usinfo.studioname }}【{{usinfo.ulevelname}}】</div>
+                    <div v-if="usinfo.ulevel == 1">{{usinfo.studioname }}【{{usinfo.ulevelname}}画室长】</div>
                     <!-- <div v-if="usinfo.mystudiocard">我的画室长：{{usinfo.mystudiocard}}</div> -->
                 </div>
             </div>

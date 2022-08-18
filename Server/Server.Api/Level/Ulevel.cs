@@ -30,10 +30,34 @@ namespace Server.Api.Level
                 new Ulevel
                 {
                     Level = 1,
-                    Name = "画室长",
+                    Name = "初级",
                     IsOption = true
                 },
-                
+                new Ulevel
+                {
+                    Level = 2,
+                    Name = "中一级",
+                    IsOption = true
+                },
+                new Ulevel
+                {
+                    Level = 3,
+                    Name = "中二级",
+                    IsOption = true
+                },
+                new Ulevel
+                {
+                    Level = 4,
+                    Name = "中三级",
+                    IsOption = true
+                },
+                new Ulevel
+                {
+                    Level = 5,
+                    Name = "高级",
+                    IsOption = false
+                }
+
             };
 
             //if (dbConnect != null)

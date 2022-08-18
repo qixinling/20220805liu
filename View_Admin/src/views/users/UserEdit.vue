@@ -25,17 +25,17 @@
                             <el-button type="primary" size="mini" @click="updatereman">修改</el-button>
                         </el-form-item>
                        <el-form-item label="会员级别">
-                            <el-select v-model="ulevel" placeholder="请选择会员级别" @change="ulevelChange">
+                            <el-select v-model="ulevel" placeholder="请选择会员级别" @change="ulevelChange" style="padding-right: 10px;">
                                 <el-option v-for="(item,index) in ulevellist" :key="index" :label="item.name" :value="index">
                                 </el-option>
                             </el-select>
 							<el-button type="primary" size="mini" @click="updatehuashi">修改</el-button>
                         </el-form-item>
-						<el-form-item label="画室名">
-						    <el-input type="text" v-model="users.studioname"></el-input>
+						<el-form-item label="画室名" v-if="ulevel > 0">
+						    <el-input type="text" v-model="users.studioname" placeholder="设置画室名"></el-input>
 						</el-form-item>
-						<el-form-item label="画室编号">
-						    <el-input type="text" v-model="users.studiocard"></el-input>
+						<el-form-item label="画室编号" v-if="ulevel > 0">
+						    <el-input type="text" v-model="users.studiocard" placeholder="设置画室编号"></el-input>
 						</el-form-item>
 						<!-- <el-form-item label="万能账号">
 						    <el-switch v-model="users.iswn" active-value="1" inactive-value="0">

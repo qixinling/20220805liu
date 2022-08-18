@@ -4,8 +4,8 @@
         <div class="cardBox">
             <div class="cardContent">
                 <van-field v-model.trim="studioname" label="画室名称" placeholder="请输入画室名称" :disabled="zdshow" />
-				<van-field v-if="studiocard != null" v-model.trim="studiocard" type="tel" label="当前登船编码"  readonly  />
-                <van-field v-model.trim="newstudiocard" type="tel" label="登船新编码"  placeholder="请输入登船新编码"  />
+				<van-field v-if="studiocard != null" v-model.trim="studiocard" type="tel" label="画室编码"  readonly  />
+                <van-field v-model.trim="newstudiocard" type="tel" label="画室新编码"  placeholder="请输入画室新编码"  />
             </div>
         </div>
 		<div style="font-size: 12px;padding-left: 10px;">

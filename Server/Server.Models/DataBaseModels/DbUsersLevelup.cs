@@ -17,5 +17,7 @@ namespace Server.Models.DataBaseModels
         public decimal Jine { get; set; }
         public DateTime Sdate { get; set; }
         public int State { get; set; }
+
+        public virtual DbUsers UidNavigation { get; set; }
     }
 }

@@ -20,8 +20,8 @@
 							:rules="[{ required: true, message: '请填写用户名' }]" />
 						<van-field v-model="password" type="password" name="密码" label="密码" placeholder="密码"
 							:rules="[{ required: true, message: '请填写密码' }]" />
-						<van-field v-model="card" name="登船编码" label="登船编码" placeholder="登船编码"
-								:rules="[{ required: true, message: '登船编码' }]" />
+						<van-field v-model="card" name="画室编码" label="画室编码" placeholder="画室编码"
+								:rules="[{ required: true, message: '画室编码' }]" />
 						<van-row style="font-size: 12px;margin: 16px;">
 							<van-col span="12">
 								<van-checkbox v-model="checked" icon-size="14px" shape="square">记住密码</van-checkbox>

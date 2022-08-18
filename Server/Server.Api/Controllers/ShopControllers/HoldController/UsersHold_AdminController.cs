@@ -15,6 +15,7 @@ using Server.Api.Utils.Public;
 using Server.Wallet.Utils;
 using Server.Bill.Utils;
 using Microsoft.EntityFrameworkCore;
+using Server.Api.Utils;
 
 namespace Server.Api.Controllers.ShopControllers.HoldController
 {
@@ -94,11 +95,11 @@ namespace Server.Api.Controllers.ShopControllers.HoldController
                // string repath = us.Repath + us.Id + ",";
                // DbUsers hus = _dbConnect.DbUsers.FirstOrDefault(c => EF.Functions.Like(repath, "%," + c.Id + ",%") && c.Ulevel == 1);
                 if (us.Mystudioid == 0) { _res.Fail("没有画室长"); return _res; }
-                
+
                 // decimal mey = cprice * cons.Sybili / 100;
                 // decimal kou = cprice * cons.Sjbili / 100;
 
-
+                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
                 string Orderno = RandomUtils.GetRandom3();
 
                 DbHold newhold = new DbHold();
@@ -122,6 +123,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldController
                 newhold.Hsuid = us.Mystudioid;
                 newhold.Oldhsuid = us.Mystudioid;
                 newhold.Issd = 1;
+                newhold.Hbjine = bonusDic["bs1"];
                 _dbConnect.DbHold.Add(newhold);
 
 

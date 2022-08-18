@@ -17,6 +17,7 @@ namespace Server.Models.DataBaseModels
             DbUsersFwzxApply = new HashSet<DbUsersFwzxApply>();
             DbUsersJihuoRecordJidNavigation = new HashSet<DbUsersJihuoRecord>();
             DbUsersJihuoRecordUidNavigation = new HashSet<DbUsersJihuoRecord>();
+            DbUsersLevelup = new HashSet<DbUsersLevelup>();
             DbWallets = new HashSet<DbWallets>();
             DbWalletsChongzhi = new HashSet<DbWalletsChongzhi>();
             DbWalletsTixian = new HashSet<DbWalletsTixian>();
@@ -98,6 +99,7 @@ namespace Server.Models.DataBaseModels
         public virtual ICollection<DbUsersFwzxApply> DbUsersFwzxApply { get; set; }
         public virtual ICollection<DbUsersJihuoRecord> DbUsersJihuoRecordJidNavigation { get; set; }
         public virtual ICollection<DbUsersJihuoRecord> DbUsersJihuoRecordUidNavigation { get; set; }
+        public virtual ICollection<DbUsersLevelup> DbUsersLevelup { get; set; }
         public virtual ICollection<DbWallets> DbWallets { get; set; }
         public virtual ICollection<DbWalletsChongzhi> DbWalletsChongzhi { get; set; }
         public virtual ICollection<DbWalletsTixian> DbWalletsTixian { get; set; }

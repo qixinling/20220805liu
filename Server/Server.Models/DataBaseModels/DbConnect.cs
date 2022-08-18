@@ -2723,6 +2723,12 @@ namespace Server.Models.DataBaseModels
                     .HasColumnType("int(11)")
                     .HasColumnName("ylevel")
                     .HasComment("原级别");
+
+                entity.HasOne(d => d.UidNavigation)
+                    .WithMany(p => p.DbUsersLevelup)
+                    .HasForeignKey(d => d.Uid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("db_users_levelup_ibfk_1");
             });
 
             modelBuilder.Entity<DbWallets>(entity =>

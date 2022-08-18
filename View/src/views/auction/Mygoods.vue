@@ -38,23 +38,32 @@
           <div>金额：{{ item.jprice }}</div>
           <div>上架费：{{ item.sjjine }}</div>
         </div>
-        <!-- <div class="upload" v-if="item.state != 3">
+		<div class="jine-wrap-row">
+		  <div>付款方式</div>
+		  <div>
+			  <van-radio-group v-model="lx">
+  <van-radio :name="1">画贝支付</van-radio>
+  <van-radio :name="2" style="padding-top: 10px;">线下支付</van-radio>
+</van-radio-group></div>
+		</div>
+        <div class="upload" v-if="item.state != 3">
           <div>上传支付凭证</div>
           <UploadPictures 
             :haveImgList="item.zhimg?[{url: getimg(item.zhimg)}]: haveImgList[index] ? [{url: getimg(haveImgList[index])}] : []" 
             @getUploadPictures="getUploadPictures" @click.native="uploadClick(index)" title="" />
-        </div> -->
-		<!-- <div class="upload" v-if="item.state == 3">
+        </div>
+		<div class="upload" v-if="item.state == 3 && lx == 2" >
 		  <div>上架支付凭证</div>
 		  <UploadPictures 
 		    :haveImgList="item.sjimg?[{url: getimg(item.sjimg)}]: haveImgList[index] ? [{url: getimg(haveImgList[index])}] : []" 
 		    @getUploadPictures="getUploadPictures" @click.native="uploadClick(index)" title="" />
-		</div> -->
+		</div>
 		<div style="padding: 4px;;" class="bnt-wrap">
 			<!-- <div v-if="item.state == 3" style="font-size: 12px;padding: 5px 0px;color: red;">转售截止时间:{{item.edate}}</div> -->
 			<van-button size="small" v-if="item.state == 1 && item.buid ==uid " style="background-color: #FC4702; color: #fff"  @click="onShowBank(item,1)">立即付款</van-button>
 			<van-col span="24" v-if="item.state==2  && item.uid ==uid" style="padding: 5px;text-align: right;"><van-button size="small" style="background-color: #FC4702; color: #fff" @click="shoukuanSubmit(item.id)">确认收款</van-button></van-col>
-			<van-button size="small" v-if="item.state == 3 && item.buid ==uid && item.issj == 0" style="background-color: #FC4702; color: #fff"  @click="onShowBank(item,2)">上架申请</van-button>
+			<van-button size="small" v-if="lx == 1 &&item.state == 3 && item.buid ==uid && item.issj == 0" style=" background-color: #FC4702; color: #fff"  @click="shangjia(item.id)">上架</van-button>
+			<van-button size="small" v-if="lx == 2 && item.state == 3 && item.buid ==uid && item.issj == 0" style="background-color: #FC4702; color: #fff"  @click="onShowBank(item,2)">上架申请</van-button>
 			<van-button size="small" v-if="item.state == 3 && item.buid ==uid && item.issj == 1" style="background-color: #969799; color: #fff"  >上架审核中</van-button>
 			<van-button size="small" v-if="item.state == 4" style="background-color: #FC4702; color: #fff" @click="tolink('OrderDetails?id=' + item.id)">查看详情</van-button>
 		</div>	
@@ -139,7 +148,9 @@ import {
     Empty,
 	Field,
 	CellGroup,
-	CountDown
+	CountDown,
+	Radio,
+	RadioGroup
 } from "vant";
 Vue.use(Dialog);
 Vue.use(Tab);
@@ -156,7 +167,8 @@ Vue.use(Empty);
 Vue.use(Field);
 Vue.use(CellGroup);
 Vue.use(CountDown);
-
+Vue.use(Radio);
+Vue.use(RadioGroup);
 export default {
   name: '',
   components: {
@@ -184,7 +196,8 @@ export default {
     orderActiveObj: {},
     site: {},
     showBankBtnLx: "",
-	uid:''
+	uid:'',
+	lx:1
     }
   },
   created() {
@@ -284,6 +297,47 @@ export default {
         });
       }
     },
+	shangjia(hid) {
+	  if(this.site.ispay == 1) {
+	   let that = this
+	   that.hid = id
+	   that.$dialog.confirm({
+	     title: "提示",
+	     message: "你确认上架吗？"
+	   }).then(() => {
+	     that.$request.post(
+	       "api/UsersHold/Fukuan2",
+	       {
+	         token: that.$utils.getloc("token"),
+	         userid: that.$utils.getloc("userid"),
+	         uid: that.$utils.getloc("id"),
+	         hid: hid,
+	         lx:1,
+	       },
+	       (res) => {
+			   if(res.data.code == 0){
+				   that.$dialog.alert({
+				     title: "提示",
+				     message: res.data.msg,
+				   });
+				   return;
+			   }
+	         that.$dialog.alert({
+	           title: "提示",
+	           message: res.data.msg,
+	         });
+	        
+	         that.getdata(that.active)
+	       }
+	     )
+	   })
+	  } else {
+	    this.$dialog.alert({
+	      title: "提示",
+	      message: "未到交易时间",
+	    });
+	  }
+	},
     // 弹窗确认按钮 中转
     confirmZhongzhuan() {
       if(this.showBankBtnLx == 1) {
@@ -350,10 +404,17 @@ export default {
  //        // on cancel
  //      });
 	// },
-	//转售
+	//上架审核
 	zhuanshou() {
 	  let that = this
 	  let sjimg = this.haveImgList[that.uploadIndex] ? this.haveImgList[that.uploadIndex] : "";
+	  if(sjimg == '' || sjimg == null){
+		  that.$dialog.alert({
+		    title: "提示",
+		    message: "请先上传凭证",
+		  });
+		  return;
+	  }
 	 // console.log(sjimg);
       that.$request.post(
         "api/UsersHold/Fukuan2",
@@ -362,7 +423,8 @@ export default {
           userid: that.$utils.getloc("userid"),
           uid: that.$utils.getloc("id"),
           hid: that.hid,
-			    sjimg
+		  lx:2,
+		sjimg
         },
         (res) => {
           that.$dialog.alert({

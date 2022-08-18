@@ -19,7 +19,7 @@
 					<van-cell title="画室统计" icon="star" value="" is-link to="./Tongji" />
 					<van-cell title="字画管理" icon="photo " value="" is-link to="Zihua" />
 					<van-cell title="转画管理" icon="share" value="" is-link to="./Zhuanhua" />
-					<van-cell title="登船编码" icon="friends-o" value="" is-link to="./HsInfo">
+					<van-cell title="画室编码" icon="friends-o" value="" is-link to="./HsInfo">
                         <template #icon>
                             <img src="@/assets/img/kongzhi6.svg" width="24.5" height="24" style="margin-right:9px" />
                         </template>
@@ -29,6 +29,8 @@
                             <img src="@/assets/img/kongzhi6.svg" width="24.5" height="24" style="margin-right:9px" />
                         </template>
                     </van-cell>
+					<van-cell title="我的打款" icon="friends" value="" is-link to="./DaKuan" />
+					<van-cell title="我的收款" icon="friends" value="" is-link to="./ShouKuan" />
                     <van-cell icon="diamond" title="会员预约">
                         <template #right-icon>
                             <van-switch v-model="checked" active-color="#FC4702" size="24px" @change="change" />

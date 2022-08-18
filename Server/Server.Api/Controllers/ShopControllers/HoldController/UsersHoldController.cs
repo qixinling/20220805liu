@@ -103,7 +103,6 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         dbHold.Qgdate = DateTime.Now;
                         dbHold.Isyy = 1;
                         dbHold.Pid = pid;
-                        dbHold.Hbjine = 500;
                         dbHold.Yajin = yajin;
 
                         Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, _dbConnect);
@@ -112,7 +111,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         bill.Create(us.Id, new Dictionary<int, decimal>{{1,yajin}}, _dbConnect, "冻结", 0);
 
                         res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
-                        bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, _dbConnect, "冻结", 0);
+                        bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, _dbConnect, "冻结", 0);
                         if (res.Code == 0) { break; }
 
                         break;
@@ -198,7 +197,6 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         hold.Busername = us.Username;
                         hold.Busertel = us.Usertel;
                         hold.Qgdate = DateTime.Now;
-                        hold.Hbjine = 500;
                         hold.Yajin = yajin;
 
                         Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, dbConnect);
@@ -207,7 +205,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
 
                         res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
-                        bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+                        bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, dbConnect, "冻结", 0);
                         if (res.Code == 0) { break; }
                         break;
                     }
@@ -445,7 +443,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 DbHold hold = _dbConnect.DbHold.FirstOrDefault(c => c.Buid == uid && c.Id == hid && c.Isdelete == 0);
                 if (hold == null) { _res.Fail("交易信息出错"); return _res; }
                 if (hold.State == 2) { _res.Fail("已确认过付款"); return _res; }
-               // if (zfimg == "") { _res.Fail("请上传付款凭证"); return _res; }
+                if (zfimg == "") { _res.Fail("请上传付款凭证"); return _res; }
 
                 DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Userid.Equals(userid));
                 if (us == null) { _res.Fail("用户信息出错"); return _res; }
@@ -454,7 +452,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 //string Password2md5 = MD5Utils.MD5Encrypt(password2, 32);
                 //if (!us.Password2.Equals(Password2md5)) { _res.Fail("支付密码错误"); return _res; }
 
-               // hold.Zhimg = zfimg;
+                hold.Zhimg = zfimg;
                 hold.Dkdate = DateTime.Now;
                 hold.State = 2;
 
@@ -472,7 +470,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
         }
 
         /// <summary>
-        ///买方提交上架付款凭证
+        ///买方提交上架申请
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -483,26 +481,89 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
             try
             {
                 int hid = Convert.ToInt32(data["hid"]);
-                string sjimg = data["sjimg"].ToString();
+                
                 int uid = Convert.ToInt32(data["uid"]);
                 string userid = data["userid"].ToString();
-               // string password2 = data["password2"].ToString();
+
+                int lx = Convert.ToInt32(data["lx"].ToString());//1画贝2线下
+                // string password2 = data["password2"].ToString();
 
                 if (RepeatedCheckUtils.Rc(userid, 2)) { _res.Fail("请勿重复提交"); return _res; }
-                DbHold hold = _dbConnect.DbHold.FirstOrDefault(c => c.Buid == uid && c.Id == hid && c.Isdelete == 0);
-                if (hold == null) { _res.Fail("交易信息出错"); return _res; }
-                //if (hold.Sjimg != null) { _res.Fail("您已上传过凭证"); return _res; }
-               // if (sjimg == "") { _res.Fail("请上传付款凭证"); return _res; }
 
                 DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Userid.Equals(userid));
                 if (us == null) { _res.Fail("用户信息出错"); return _res; }
 
+                DbHold hold = _dbConnect.DbHold.FirstOrDefault(c => c.Buid == uid && c.Id == hid && c.Isdelete == 0);
+                if (hold == null) { _res.Fail("交易信息出错"); return _res; }
+
+                if(lx == 2) {
+                    string sjimg = data["sjimg"].ToString();
+                    if (hold.Sjimg != null) { _res.Fail("您已上传过凭证"); return _res; }
+                    if (sjimg == "") { _res.Fail("请上传付款凭证"); return _res; }
+                    hold.Sjimg = sjimg;
+                    hold.Issj = 1;
+                    hold.Sjdate = DateTime.Now.AddDays(1);//用于判断显示大厅时间
+
+                }else if(lx == 1)
+                {
+                    decimal zshouyi = hold.Jprice * 4 / 100;//新一轮打款金额打款
+                    decimal zjine = hold.Jprice + zshouyi;
+                    decimal sjjine = zjine * (decimal)2.5 / 100;
+
+                    Result res = WalletsUtils.PayBalance(us.Id, 1, sjjine, _dbConnect);
+                    if (res.Code == 0) { return _res.Fail(res.Msg); }
+                    IBill bill = new BillPay();
+                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, sjjine } }, _dbConnect, "上架费", 0);
+
+                    res = WalletsUtils.UpdateBalance(hold.Hsuid, 1, sjjine, _dbConnect);
+                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, sjjine } }, _dbConnect, us.Userid+"上架打款", 0);
+                    if (res.Code == 0) { return _res.Fail(res.Msg); }
+
+                    hold.State = 4;//交易结束，开始新的卖单
+                    string Orderno = RandomUtils.GetRandom3();
+                    DbHold newhold = new DbHold();
+                    newhold.Holdno = Orderno;
+                    newhold.Uid = hold.Buid;
+                    newhold.Userid = hold.Buserid;
+                    newhold.Username = hold.Busername;
+                    newhold.Usertel = hold.Busertel;
+                    newhold.Jid = hold.Jid;
+                    newhold.Jname = hold.Jname;
+                    newhold.Jimg = hold.Jimg;
+                    newhold.Jprice = zjine;//交易价格
+                    newhold.Rishouyi = 0;
+                    newhold.Zshouyi = zshouyi;
+                    newhold.Jsjbili = 0;
+                    newhold.Jsybili = 0;
+                    newhold.State = 0;//分红中
+                    newhold.Hdate = DateTime.Now;
+                    newhold.Path = hold.Path + "," + hold.Id;
+                    newhold.Repath = us.Repath;
+                    newhold.Sjjine = sjjine;
+                    newhold.Hsuid = hold.Hsuid;
+                    newhold.Oldhsuid = hold.Oldhsuid;
+                    newhold.Hbjine = hold.Hbjine;
+                    _dbConnect.DbHold.Add(newhold);
+                    _dbConnect.SaveChanges();
+
+                    List<IBonus> bonusList = BonusUtils.BonusList;
+                    bonusList[1].Execute((int)hold.Uid, hold.Jprice);
+                    BonusUtils.JiCha(hold.Hsuid, hold.Jprice);
+                    BonusUtils.FaFang();
+
+                }
+                else
+                {
+                    _res.Fail("未知类型"); return _res;
+                }
+
+                
+
                 DbUsers hsus = _dbConnect.DbUsers.FirstOrDefault(c=>c.Id == hold.Hsuid);
 
 
-                //hold.Sjimg = sjimg;
-                hold.Issj = 1;
-                hold.Sjdate = DateTime.Now.AddDays(1);
+                
+               
                 _dbConnect.SaveChanges();
                 if(hsus != null)
                 {
@@ -553,14 +614,17 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 hold.State = 3;
                 hold.Skdate = DateTime.Now;
 
-                //Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, hold.Yajin, dbConnect);
-                //if (res.Code == 0) { break; }
-                //IBill bill = new BillPay();
-                //bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+                Result res = WalletsUtils.PayBalance((int)hold.Uid, 3, hold.Yajin, _dbConnect);
+                IBill bill = new BillPay();
+                bill.Create(us.Id, new Dictionary<int, decimal> { { 3, hold.Yajin } }, _dbConnect, "解冻", 0);
 
-                //res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
-                //bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
-                //if (res.Code == 0) { break; }
+                res = WalletsUtils.UpdateBalance((int)hold.Uid, 1, hold.Yajin, _dbConnect);
+                bill.Create(us.Id, new Dictionary<int, decimal> { { 1, hold.Yajin } }, _dbConnect, "解冻", 0);
+
+                DbUsers buyus = _dbConnect.DbUsers.FirstOrDefault(c => c.Id == hold.Buid);
+
+                //完成交易算业绩
+                UsersUtils.AddReteamYeji(buyus.Reid, buyus.Repath, hold.Jprice, 1, 1, _dbConnect);
 
                 _dbConnect.SaveChanges();
                 _res.Done(null, "您已收款，交易成功");
@@ -632,13 +696,14 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 newhold.Repath = us.Repath;
                 newhold.Sjjine = sjjine;
                 newhold.Hsuid = hold.Hsuid;
-                
+                newhold.Hbjine = hold.Hbjine;
                 newhold.Oldhsuid = hold.Oldhsuid;
                 _dbConnect.DbHold.Add(newhold);
                 _dbConnect.SaveChanges();
 
                 List<IBonus> bonusList = BonusUtils.BonusList;
                 bonusList[1].Execute((int)hold.Uid, hold.Jprice);
+                BonusUtils.JiCha(hold.Hsuid, hold.Jprice);
                 BonusUtils.FaFang();
 
                 _res.Done(null, "上架成功");

@@ -24,36 +24,7 @@ namespace Server.Api.Level
                     Name = "无",
                     IsOption = true
                 },
-                new Xlevel
-                {
-                    Level = 1,
-                    Name = "初级",
-                    IsOption = true
-                },
-                new Xlevel
-                {
-                    Level = 2,
-                    Name = "中一级",
-                    IsOption = true
-                },
-                new Xlevel
-                {
-                    Level = 3,
-                    Name = "中二级",
-                    IsOption = true
-                },
-                new Xlevel
-                {
-                    Level = 4,
-                    Name = "中三级",
-                    IsOption = true
-                },
-                new Xlevel
-                {
-                    Level = 5,
-                    Name = "高级",
-                    IsOption = false
-                }
+                
             };
         }
 

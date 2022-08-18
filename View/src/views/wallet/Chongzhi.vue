@@ -3,7 +3,7 @@
         <HeadBar :title="title" :bg="'transparent'"></HeadBar>
         <div class="cardBox" v-if="selectlist.length > 0">
             <div class="cardContent">
-                <van-cell :title="item.bname+'余额'" :value="item.jine" v-for="(item, index) in selectlist" v-bind:key="index" />
+                <van-cell :title="item.bname" :value="item.jine" v-for="(item, index) in selectlist" v-bind:key="index" />
             </div>
         </div>
 
@@ -132,7 +132,9 @@ export default {
                         return;
                     }
                     let data = res.data.data;
-                    
+                    if (data.length > 0) {
+                        _this.hblx = data[0].bid;
+                    }
                     _this.selectlist = data;
                 }
             );

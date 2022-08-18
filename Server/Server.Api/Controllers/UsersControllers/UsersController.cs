@@ -1063,8 +1063,9 @@ namespace Server.Api.Controllers.UsersControllers
                     dic.Add("shouru", us.Shouru.ToString());
                     dic.Add("studioname", us.StudioName);
                     dic.Add("studiocard", us.StudioCard);
+                    dic.Add("riteamyeji", us.Riteamyeji.ToString());
 
-                    if(us.Mystudioid != 0)
+                    if (us.Mystudioid != 0)
                     {
                         DbUsers hus = _dbConnect.DbUsers.FirstOrDefault(c => c.Id == us.Mystudioid);
                         if(hus != null)

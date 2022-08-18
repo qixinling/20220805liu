@@ -25,7 +25,7 @@ namespace Server.Api.Controllers.WalletsControllers.JichaDakuanControllers
         }
 
         /// <summary>
-        /// 查询充值记录
+        /// 查询记录
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -52,6 +52,7 @@ namespace Server.Api.Controllers.WalletsControllers.JichaDakuanControllers
                     c.State,
                     c.Liushuihao,
                     c.Dkimg,
+                    blist = _dbConnect.DbUsersBank.Where(u=>u.Uid == c.Suid).ToList(),
                     stateName = c.State == 0 ? "未打款" : c.State == 1 ? "已打款" : "-"
                 }).FirstOrDefault(c => c.Id == id);
                 _res.Done(clist, "查询成功");
@@ -66,7 +67,7 @@ namespace Server.Api.Controllers.WalletsControllers.JichaDakuanControllers
         }
 
         /// <summary>
-        /// 查询充值记录
+        /// 查询记录
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -111,6 +112,46 @@ namespace Server.Api.Controllers.WalletsControllers.JichaDakuanControllers
             catch (Exception ex)
             {
                 _res.Error("查询级差打款异常");
+
+                NLogHelper._.Error(_res.Msg, ex);
+            }
+            return _res;
+        }
+
+        /// <summary>
+        /// 提交
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [TokenCheckFilters]
+        [SignCheckFilters]
+        public Result Dakuan(JObject data)
+        {
+            try
+            {
+                int uid = Convert.ToInt32(data["uid"]);
+                string userid = data["userid"].ToString();
+                int jid = Convert.ToInt32(data["jid"]);
+                string dkimg = data["dkimg"].ToString();
+                string liushui = data["liushui"].ToString();
+
+                if (RepeatedCheckUtils.Rc(userid, 2)) { _res.Fail("请勿重复提交"); return _res; }
+
+                DbJichaDakuan jicha = _dbConnect.DbJichaDakuan.FirstOrDefault(c => c.Id == jid);
+                if(jicha == null) { return _res.Fail("信息出错"); }
+                if(jicha.State != 0) { return _res.Fail("打款状态有误"); }
+
+                jicha.Dkimg = dkimg;
+                jicha.Ddate = DateTime.Now;
+                jicha.State = 1;
+                jicha.Liushuihao = liushui;
+
+                _dbConnect.SaveChanges();
+                _res.Done(null, "提交成功");
+            }
+            catch (Exception ex)
+            {
+                _res.Error("打款异常");
 
                 NLogHelper._.Error(_res.Msg, ex);
             }

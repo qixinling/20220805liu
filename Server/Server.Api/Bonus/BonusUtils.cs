@@ -58,11 +58,11 @@ namespace Server.Bonus
             try
             {
                 using DbConnect _dbConnect = DbConnectUtils.GetDbContext();
-                DbUsers yus = _dbConnect.DbUsers.FirstOrDefault(u => u.Id == yid && u.Xlevel >= 1);
+                DbUsers yus = _dbConnect.DbUsers.FirstOrDefault(u => u.Id == yid && u.Ulevel >= 1);
                 if (yus != null)
                 {
                     decimal bl = 0;
-                    switch (yus.Xlevel)
+                    switch (yus.Ulevel)
                     {
                         case 1:
                             bl = (decimal)0.5;
@@ -81,13 +81,13 @@ namespace Server.Bonus
                             break;
                     }
                     DbUsers lastUs = yus;
-                    List<DbUsers> usList = _dbConnect.DbUsers.Where(u => EF.Functions.Like(yus.Repath, "%," + u.Id + ",%") && u.Xlevel > yus.Xlevel).OrderByDescending(u => u.Relevel).ToList();
+                    List<DbUsers> usList = _dbConnect.DbUsers.Where(u => EF.Functions.Like(yus.Repath, "%," + u.Id + ",%") && u.Ulevel > yus.Ulevel).OrderByDescending(u => u.Relevel).ToList();
                     foreach (var us in usList)
                     {
-                        if (us.Xlevel > lastUs.Xlevel)
+                        if (us.Ulevel > lastUs.Ulevel)
                         {
                             decimal bili = 0;
-                            switch (us.Xlevel)
+                            switch (us.Ulevel)
                             {
                                 case 1:
                                     bili = (decimal)0.5;

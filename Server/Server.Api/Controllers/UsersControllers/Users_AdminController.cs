@@ -1268,7 +1268,7 @@ namespace Server.Api.Controllers.UsersControllers
         }
 
         /// <summary>
-        ///  
+        ///  修改级别
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
@@ -1290,7 +1290,7 @@ namespace Server.Api.Controllers.UsersControllers
                 DbUsers us = um.GetById(select_id);
                 if (us == null) { _res.Fail("用户信息错误"); return _res; }
 
-                if(ul == 1)
+                if(ul > 0)
                 {
                     us.Mystudioid = us.Id;
                     us.Mystudioname = us.Userid;
@@ -1300,22 +1300,33 @@ namespace Server.Api.Controllers.UsersControllers
                     {
                         u.Mystudioid = us.Id;
                         u.Mystudioname = us.Userid;
+                        List<DbHold> hlist = _dbConnect.DbHold.Where(c => c.Uid == u.Id).ToList();
+                        foreach (DbHold hold in hlist)
+                        {
+                            if (hold.Hsuid != hold.Oldhsuid)//记录前画室id
+                            {
+                                hold.Oldhsuid = hold.Hsuid;
+                            }
+                            hold.Hsuid = us.Id;
+                        }
                     }
-                }else if(ul == 0 && us.Ulevel == 1)
-                {
-                   DbUsers jus = _dbConnect.DbUsers.FirstOrDefault(c => EF.Functions.Like(us.Repath, "%," + c.Id + ",%") && c.Ulevel == 1);
-                    List<DbUsers> ulist = _dbConnect.DbUsers.Where(c => EF.Functions.Like(c.Repath, "%," + us.Id + ",%")).ToList();
-                    foreach (DbUsers u in ulist)
-                    {
-                        u.Mystudioid = jus.Id;
-                        u.Mystudioname = jus.Userid;
-                    }
-                    us.Mystudioid = jus.Id;
-                    us.Mystudioname = jus.Userid;
-                    us.StudioName = null;
-                    us.StudioCard = null;
 
                 }
+                //else if(ul == 0 && us.Ulevel > 0)
+                //{
+                //   DbUsers jus = _dbConnect.DbUsers.FirstOrDefault(c => EF.Functions.Like(us.Repath, "%," + c.Id + ",%") && c.Ulevel == 1);
+                //    List<DbUsers> ulist = _dbConnect.DbUsers.Where(c => EF.Functions.Like(c.Repath, "%," + us.Id + ",%")).ToList();
+                //    foreach (DbUsers u in ulist)
+                //    {
+                //        u.Mystudioid = jus.Id;
+                //        u.Mystudioname = jus.Userid;
+                //    }
+                //    us.Mystudioid = jus.Id;
+                //    us.Mystudioname = jus.Userid;
+                //    us.StudioName = null;
+                //    us.StudioCard = null;
+
+                //}
                 us.Ulevel = ul;
                 _dbConnect.SaveChanges();
                 _res.Done(null, "修改成功");
