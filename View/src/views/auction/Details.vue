@@ -36,7 +36,10 @@
 			
 			 </div>
           </van-col>
+		  <van-col span="24" v-if="data.state == 0 && data.uid == uid " style="padding: 5px;"><van-button size="normal" style="background-color: #FC4702; color: #fff" block @click="dakuan(data)">提交</van-button></van-col>
         </van-row>
+		
+		
 		<div style="padding: 5px;">
 			<div class="content-name" style="padding: 5px;">收款账户</div>
 			<div class="sk" style="border-bottom: 1px solid #E6A23C;" v-for="(bank,bankindex) in data.blist" :key="bankindex">
@@ -65,7 +68,7 @@
         
         
 		<van-row>
-			<van-col span="24" v-if="data.state == 0 && data.uid == uid " style="padding: 5px;"><van-button size="normal" style="background-color: #FC4702; color: #fff" block @click="dakuan(data)">提交</van-button></van-col>
+			
 			
 		   <!-- <span v-if="item.sellissu==1" style="font-size: 12px;color: red;float: right;padding: 5px;">温馨提示：已提交申诉，请等待审核</span> -->
 		</van-row>

@@ -29,7 +29,7 @@
 			
           </van-col>
         </van-row>
-        <div style="padding: 5px;">
+       <!-- <div style="padding: 5px;">
            <van-field v-model.trim="item.liushuihao" type="tel" label="流水号"  placeholder="请输入流水号"  />
 		   <div class="upload">
 		     <div style="margin-bottom:5px">上传凭证</div>
@@ -37,10 +37,10 @@
 		       :haveImgList="item.dkimg?[{url: getimg(item.dkimg)}]: haveImgList[index] ? [{url: getimg(haveImgList[index])}] : []" 
 		       @getUploadPictures="getUploadPictures" @click.native="uploadClick(index)" title="" />
 		   </div>
-        </div>
+        </div> -->
         
 		<van-row>
-			<van-col span="24" v-if="item.state == 0" style="padding: 5px;"><van-button size="normal" style="background-color: #FC4702; color: #fff" block @click="dakuan(item)">提交</van-button></van-col>
+			<van-col span="24" style="padding: 5px;text-align: right;"><van-button size="small" style="border: 1px solid #FC4702; color: #FC4702"  @click="tolink(item.id)">查看详情</van-button></van-col>
 			
 		   <!-- <span v-if="item.sellissu==1" style="font-size: 12px;color: red;float: right;padding: 5px;">温馨提示：已提交申诉，请等待审核</span> -->
 		</van-row>
@@ -136,9 +136,13 @@ export default {
         return this.$config.send_url + "Upload/" + img;
       }
     },
-	Sellshensu(id){
-		this.hid = id;
-		this.sushow = true;
+	tolink(id){
+		this.$router.push({
+			name:'Details',
+			query:{
+				id:id
+			}
+		})
 	},
 	
     getdata() {
