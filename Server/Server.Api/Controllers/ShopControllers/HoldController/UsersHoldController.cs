@@ -81,10 +81,12 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 }
                 if (dbHold == null) { return _res.Fail("该预约已满"); }
 
-                decimal yajin = 200;
+                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
+
+                decimal yajin = bonusDic["bs2"];
+
                 DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c => c.Uid == us.Id && c.Cid == 1);
                 if(uw.Jine < yajin) { return _res.Fail("画贝余额不足"); }
-
                 do
                 {
                     using DbConnect dbConnect = DbConnectUtils.GetDbContext();
@@ -104,15 +106,18 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         dbHold.Isyy = 1;
                         dbHold.Pid = pid;
                         dbHold.Yajin = yajin;
+                        if(yajin > 0)
+                        {
+                            Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, _dbConnect);
+                            if (res.Code == 0) { break; }
+                            IBill bill = new BillPay();
+                            bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, _dbConnect, "冻结", 0);
 
-                        Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, _dbConnect);
-                        if (res.Code == 0) { break; }
-                        IBill bill = new BillPay();
-                        bill.Create(us.Id, new Dictionary<int, decimal>{{1,yajin}}, _dbConnect, "冻结", 0);
-
-                        res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
-                        bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, _dbConnect, "冻结", 0);
-                        if (res.Code == 0) { break; }
+                            res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
+                            bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, _dbConnect, "冻结", 0);
+                            if (res.Code == 0) { break; }
+                        }
+                        
 
                         break;
                     }
@@ -178,7 +183,10 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 if (hold.State != 0) { return _res.Fail("该单已售出"); }
                 if (hold.Isdelete != 0) { return _res.Fail("该单已删除"); }
 
-                decimal yajin = 200;
+                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
+
+                decimal yajin = bonusDic["bs2"];
+               
                 DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c => c.Uid == us.Id && c.Cid == 1);
                 if (uw.Jine < yajin) { return _res.Fail("画贝余额不足"); }
 
@@ -199,14 +207,19 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         hold.Qgdate = DateTime.Now;
                         hold.Yajin = yajin;
 
-                        Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, dbConnect);
-                        if (res.Code == 0) { break; }
-                        IBill bill = new BillPay();
-                        bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
 
-                        res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
-                        bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, dbConnect, "冻结", 0);
-                        if (res.Code == 0) { break; }
+                        if(yajin > 0)
+                        {
+                            Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, dbConnect);
+                            if (res.Code == 0) { break; }
+                            IBill bill = new BillPay();
+                            bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+
+                            res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
+                            bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, dbConnect, "冻结", 0);
+                            if (res.Code == 0) { break; }
+                        }
+
                         break;
                     }
                     else
