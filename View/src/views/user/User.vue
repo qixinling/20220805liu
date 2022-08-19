@@ -223,7 +223,14 @@ export default {
 		                return;
 		            }
 		            _toast.clear();
-		            _this.walletJine = res.data.data.ulist[0].jine;
+					console.log();
+					var data = res.data.data.ulist;
+					data.forEach(item=>{
+						if(item.cid == 1){
+							 _this.walletJine = item.jine;
+						}
+					})
+		           
 					
 		        }
 		    );

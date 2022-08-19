@@ -330,6 +330,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     c.Issj,
                     c.Sjimg,
                     c.Sjjine,
+                    c.Zhimg,
                     banklist = _dbConnect.DbUsersBank.Where(u => u.Uid == c.Uid).ToList(),
                     hsbanklist = _dbConnect.DbUsersBank.Where(u => u.Uid == c.Hsuid).ToList()
                 }).ToList();
@@ -509,6 +510,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 DbHold hold = _dbConnect.DbHold.FirstOrDefault(c => c.Buid == uid && c.Id == hid && c.Isdelete == 0);
                 if (hold == null) { _res.Fail("交易信息出错"); return _res; }
 
+                string msg = "";
                 if(lx == 2) {
                     string sjimg = data["sjimg"].ToString();
                     if (hold.Sjimg != null) { _res.Fail("您已上传过凭证"); return _res; }
@@ -516,8 +518,9 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     hold.Sjimg = sjimg;
                     hold.Issj = 1;
                     hold.Sjdate = DateTime.Now.AddDays(1);//用于判断显示大厅时间
-
-                }else if(lx == 1)
+                    msg = "申请成功";
+                }
+                else if(lx == 1)
                 {
                     decimal zshouyi = hold.Jprice * 4 / 100;//新一轮打款金额打款
                     decimal zjine = hold.Jprice + zshouyi;
@@ -564,26 +567,23 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     BonusUtils.JiCha(hold.Hsuid, hold.Jprice);
                     BonusUtils.FaFang();
 
+                    msg = "上架成功";
+
                 }
                 else
                 {
                     _res.Fail("未知类型"); return _res;
                 }
 
-                
-
-                DbUsers hsus = _dbConnect.DbUsers.FirstOrDefault(c=>c.Id == hold.Hsuid);
-
-
-                
-               
                 _dbConnect.SaveChanges();
+
+                DbUsers hsus = _dbConnect.DbUsers.FirstOrDefault(c=>c.Id == hold.Hsuid);              
                 if(hsus != null)
                 {
                     MsgUtils.Send(0, "交易", hold.Jname + "该交易买家已申请上架，注意查收", 0, "系统消息", (int)hsus.Id, hold.Userid);
                 }
                
-                _res.Done(null, "申请成功");
+                _res.Done(null, msg);
             }
             catch (Exception ex)
             {

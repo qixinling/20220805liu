@@ -394,11 +394,11 @@
 	.goodsname {
 		/* height: 38px; */
 		margin-bottom: 4px;
-		font-size: 13px;
+		font-size: 12px;
 		font-weight: 600;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 1;
+		-webkit-line-clamp: 2;
 		overflow: hidden;
 		color: #333;
 	}
