@@ -520,19 +520,19 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     hold.Sjdate = DateTime.Now.AddDays(1);//用于判断显示大厅时间
                     msg = "申请成功";
                 }
-                else if(lx == 1)
+                else if(lx == 1)//上架画贝支付
                 {
                     decimal zshouyi = hold.Jprice * 4 / 100;//新一轮打款金额打款
                     decimal zjine = hold.Jprice + zshouyi;
                     decimal sjjine = zjine * (decimal)2.5 / 100;
 
-                    Result res = WalletsUtils.PayBalance(us.Id, 1, sjjine, _dbConnect);
+                    Result res = WalletsUtils.PayBalance(us.Id, 1, hold.Sjjine, _dbConnect);
                     if (res.Code == 0) { return _res.Fail(res.Msg); }
                     IBill bill = new BillPay();
-                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, sjjine } }, _dbConnect, "上架费", 0);
+                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, hold.Sjjine } }, _dbConnect, "上架费", 0);
 
-                    res = WalletsUtils.UpdateBalance(hold.Hsuid, 1, sjjine, _dbConnect);
-                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, sjjine } }, _dbConnect, us.Userid+"上架打款", 0);
+                    res = WalletsUtils.UpdateBalance(hold.Hsuid, 1, hold.Sjjine, _dbConnect);
+                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, hold.Sjjine } }, _dbConnect, us.Userid+"上架打款", 0);
                     if (res.Code == 0) { return _res.Fail(res.Msg); }
 
                     hold.State = 4;//交易结束，开始新的卖单
@@ -563,7 +563,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     _dbConnect.SaveChanges();
 
                     List<IBonus> bonusList = BonusUtils.BonusList;
-                    bonusList[1].Execute((int)hold.Uid, hold.Jprice);
+                    bonusList[1].Execute((int)hold.Buid, hold.Jprice);
                     BonusUtils.JiCha(hold.Hsuid, hold.Jprice);
                     BonusUtils.FaFang();
 
@@ -715,7 +715,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 _dbConnect.SaveChanges();
 
                 List<IBonus> bonusList = BonusUtils.BonusList;
-                bonusList[1].Execute((int)hold.Uid, hold.Jprice);
+                bonusList[1].Execute((int)hold.Buid, hold.Jprice);
                 BonusUtils.JiCha(hold.Hsuid, hold.Jprice);
                 BonusUtils.FaFang();
 

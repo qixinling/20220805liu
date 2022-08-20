@@ -26,9 +26,11 @@ namespace Server.Quartz
             // await JobHelper<PepeiJob>.JobAddAsync("job_Pipei", "trigger_Pipei", "group_Pipei", "0 0/1 * * * ?", 1);
 #if !DEBUG
             //await JobHelper<KangqiangJob>.JobAddAsync("job_kaiqiang", "trigger_kaiqiang", "group_kaiqiang", "0 0/1 * * * ? ", 1);
-          
-            
+           await JobHelper<YejiJob>.JobAddAsync("job_yeji", "trigger_yeji", "group_yeji", "0 0 0 1/1 * ?", 1);
+             
 #endif
+
+
             await JobHelper<KangqiangJob>.JobAddAsync("job_kaiqiang", "trigger_kaiqiang", "group_kaiqiang", "0 0/1 * * * ? ", 1);
             
         }
