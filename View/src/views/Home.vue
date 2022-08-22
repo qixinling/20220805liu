@@ -4,13 +4,7 @@
       {{headerDate}}
     </div>
 	  <div class="bjdiv">
-    <!-- <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-      <van-swipe-item v-for="(item, index) in slidelist" :key="index">
-        <div @click="slideTo(item.gid, item.lx, item.url)">
-          <img :src="getimg(item.img)" />
-        </div>
-      </van-swipe-item>
-    </van-swipe> -->
+    
 
 	<!-- <van-notice-bar left-icon="volume-o" :text="marqueemsg" /> -->
 
@@ -35,8 +29,17 @@
     </div>
   </div>
 
-  <div class="imgbox">
+  <!-- <div class="imgbox">
     <img src="@/assets/img/banner2.png" style="width:100%;height:120px" />
+  </div> -->
+  <div style="padding: 15px 0px;">
+	  <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+	    <van-swipe-item v-for="(item, index) in slidelist" :key="index">
+	      <div>
+	        <img :src="getimg(item.img)" />
+	      </div>
+	    </van-swipe-item>
+	  </van-swipe>
   </div>
 
   <div class="shop-block">
@@ -74,7 +77,7 @@
   </div>
 
   <div class="imgbox">
-    <img src="@/assets/img/banner3.png" style="width:100%;height:120px" />
+    <img src="@/assets/img/banner3.jpg" style="width:100%;height:120px" />
   </div>
 	
 	<!-- <div style="margin-top: 20px; text-align: center;padding: 10px;">
@@ -331,13 +334,13 @@ export default {
     		});
     		
     },
-    tolink(name) {
-			this.$router.push({
-			  path: name,
+ //    tolink(name) {
+	// 		this.$router.push({
+	// 		  path: name,
 			 
-			})
+	// 		})
 	
-    },
+ //    },
     // 获取毫秒数
     toMiner(hour, min, seconds) {
       var miner;

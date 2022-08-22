@@ -9,8 +9,8 @@
 
         <div class="cardBox">
             <div class="cardBox cardContent">
-                <van-field v-model="suserid" label="收款方" placeholder="请输入收款方手机号" />
-                <!-- <van-field v-model="susername" label="姓名" readonly /> -->
+                <van-field v-model="suserid" label="收款方" @input="Wallet_QueryUname" placeholder="请输入收款方手机号" />
+                <van-field v-if="susername" v-model="susername" label="姓名" readonly />
             </div>
         </div>
 
@@ -154,9 +154,9 @@ export default {
                     }
                     _this.selectlist = res.data.data;
                     let data = res.data.data;
-                    // if (data.length > 0) {
-                    //     _this.hblx = data[0].bid;
-                    // }
+                    if (data.length > 0) {
+                        _this.hblx = data[0].bid;
+                    }
                     _this.selectlist = data;
                     console.log();
                 }

@@ -11,7 +11,7 @@
 			    <div>画贝</div>
 			    <div style="color:#ff4500">{{walletJine}}</div>
 				<div style="display: flex;justify-content: center;">
-					<div class="wallet-tixian-btn" @click="tolink('Chongzhi')">充值</div>
+					<div class="wallet-tixian-btn" @click="tolink('Zhuanzhang')">转账</div>
 					<div class="wallet-tixian-btn" style="margin-left: 10px;" @click="tolink('tixian')">提现</div>
 				</div>
 			</div>

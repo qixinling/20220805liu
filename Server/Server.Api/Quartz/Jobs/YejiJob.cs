@@ -24,7 +24,7 @@ namespace Server.Quartz.Jobs
             {
                 //每日清空日团队业绩riteamyeji
                 using DbConnect dbConnect = DbConnectUtils.GetDbContext();
-                dbConnect.Database.ExecuteSqlRaw("update `db_users` set riteamyeji=0 where riteamyeji > 0");
+                dbConnect.Database.ExecuteSqlRaw("update `db_users` set riteamyeji=0 and ylsk = 0");
             }
             catch (Exception ex)
             {

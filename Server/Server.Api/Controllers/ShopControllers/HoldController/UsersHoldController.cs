@@ -97,6 +97,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     {
                         
                         us.Lsk += dbHold.Jprice;
+                        us.Ylsk += dbHold.Jprice;//用于记录今日买入
                         dbHold.State = 1;
                         dbHold.Buid = us.Id;
                         dbHold.Buserid = us.Userid;
@@ -199,6 +200,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     if(dbConnect.Database.ExecuteSqlRaw($"update `db_hold` set version='{$"{DateTime.Now.Ticks}{r.Next(10000, 99999)}"}' where id={hid} and version='{hold.Version}'") == 1)
                     {
                         us.Lsk += hold.Jprice;
+                        us.Ylsk += hold.Jprice;//用于记录今日买入
                         hold.State = 1;
                         hold.Buid = us.Id;
                         hold.Buserid = us.Userid;
@@ -896,6 +898,8 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Userid.Equals(userid));
                 if (us == null) { _res.Fail("用户信息出错"); return _res; }
 
+                int jinrinum = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Count();
+                decimal jinriprice = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Sum(c => c.Jprice);
 
                 if (state != 99)//
                 {
@@ -924,8 +928,12 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         c.Issj,
                         c.Sjimg,
                         c.Sjjine, 
+                        c.Qgdate
                     }).ToList();
-                    _res.Done(hlist, "查询成功");
+
+                   
+
+                    _res.Done(new { jinrinum, jinriprice, hlist }, "查询成功");
                 }
                 else
                 {
@@ -953,9 +961,10 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         c.Skdate,
                         c.Issj,
                         c.Sjimg,
-                        c.Sjjine
+                        c.Sjjine,
+                        c.Qgdate
                     }).ToList();
-                    _res.Done(hlist, "查询成功");
+                    _res.Done(new { jinrinum, jinriprice, hlist }, "查询成功");
                 }
             }
             catch (Exception ex)

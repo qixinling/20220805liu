@@ -5,21 +5,17 @@
             <div class="item-block" :key="index" v-for="(item, index) in tablelist">
                 <div class="cardContent">
                     <van-row>
-                        <van-col span="12" style="font-size: 14px;color: #333;font-weight: 600;">
-                            {{item.lxname}}
+                        <van-col span="16" style="font-size: 14px;color: #333;font-weight: 600;">
+                            {{item.lxname}}【{{item.yuserid}}】出售
                         </van-col>
-                        <van-col span="12" style="font-size: 14px;color: red;text-align: right;">
-                            {{item.jine}}
+                        <van-col span="8" style="font-size: 14px;color: red;text-align: right;font-weight: 600;">
+                            + {{item.jine}}
                         </van-col>
+						<van-col span="24" style="font-size: 12px;color: #777;padding-top: 10px;">
+						    {{$utils.timestampFormat(item.sdate)}}
+						</van-col>
                     </van-row>
-                    <van-row style="margin-top: 10px;">
-                        <van-col span="12" style="font-size: 12px;color: #777;">
-                            {{item.yuserid}}
-                        </van-col>
-                        <van-col span="12" style="font-size: 12px;color: #777;text-align: right;">
-                            {{$utils.timestampFormat(item.sdate)}}
-                        </van-col>
-                    </van-row>
+                    
                     <van-row style="margin-top: 10px;" v-if="item.bz != '-'">
                         <van-col span="24" style="font-size: 12px;color: #777;">
                             {{item.bz}}

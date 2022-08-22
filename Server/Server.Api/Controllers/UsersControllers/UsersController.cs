@@ -1120,57 +1120,65 @@ namespace Server.Api.Controllers.UsersControllers
             try
             {
                 string userid = Convert.ToString(data["userid"]);
-                List<Dictionary<string, string>> diclist = new List<Dictionary<string, string>>();
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                List<TreeMod> rtlist = new List<TreeMod>();
 
-                SystemSettingMethod ssm = new SystemSettingMethod(_dbConnect);
-                DbSystemSetting ss = ssm.GetById(1);
-                if (ss.Switchtjt == 0) { _res.Fail("暂未开放"); return _res; }
+                 DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c=>c.Userid.Equals(userid));
+                 if (us == null) { _res.Fail("未找到该会员"); return _res; }
 
-                UsersMethod um = new UsersMethod(_dbConnect);
-                DbUsers us = um.GetByUsersid(userid);
-                if (us == null) { _res.Fail("未找到该会员"); return _res; }
+                List<DbUsers> ulist = _dbConnect.DbUsers.Where(c => EF.Functions.Like(c.Repath, "%," + us.Id + ",%")).ToList();
 
-                List<Ulevel> uLevelList = new Ulevel().GetLevels();
-                List<ILevel> xLevelList = new Xlevel().GetLevels();
-
-                string uxName = " [";
                 
-                //if (us.Ulevel > 0)
+
+               // List<Dictionary<string, string>> diclist = new List<Dictionary<string, string>>();
+               // Dictionary<string, string> dic = new Dictionary<string, string>();
+               // List<TreeMod> rtlist = new List<TreeMod>();
+
+               // SystemSettingMethod ssm = new SystemSettingMethod(_dbConnect);
+               // DbSystemSetting ss = ssm.GetById(1);
+               // if (ss.Switchtjt == 0) { _res.Fail("暂未开放"); return _res; }
+
+               // UsersMethod um = new UsersMethod(_dbConnect);
+               // DbUsers us = um.GetByUsersid(userid);
+               // if (us == null) { _res.Fail("未找到该会员"); return _res; }
+
+               // List<Ulevel> uLevelList = new Ulevel().GetLevels();
+               // List<ILevel> xLevelList = new Xlevel().GetLevels();
+
+               // string uxName = " [";
+                
+               // //if (us.Ulevel > 0)
+               //// {
+               //     uxName += "  " + uLevelList[us.Ulevel].Name;
+               // // }
+               // //if (us.Xlevel > 0)
+               // //{
+               // //    uxName += "  " + xLevelList[us.Xlevel].Name;
+               // //}
+               // uxName += "  " + us.Teamcount;
+               // uxName += "  " + us.Lsk;
+                
+               // uxName += "  " + us.Riteamyeji + "]";
+               // TreeMod rt = new TreeMod
                // {
-                    uxName += "  " + uLevelList[us.Ulevel].Name;
-                // }
-                //if (us.Xlevel > 0)
-                //{
-                //    uxName += "  " + xLevelList[us.Xlevel].Name;
-                //}
-                uxName += "  " + us.Teamcount;
-                uxName += "  " + us.Lsk;
-                
-                uxName += "  " + us.Riteamyeji + "]";
-                TreeMod rt = new TreeMod
-                {
-                    Id = us.Id,
-                    Label = us.Usertel + uxName,
-                    Icon = "el-icon-s-custom ispay" + us.Ispay,
-                    Teamcount = us.Teamcount,
-                    Teamyeji = us.Teamyeji,
-                    Riteamyeji = us.Riteamyeji,
-                    Lsk = us.Lsk,
+               //     Id = us.Id,
+               //     Label = us.Usertel + uxName,
+               //     Icon = "el-icon-s-custom ispay" + us.Ispay,
+               //     Teamcount = us.Teamcount,
+               //     Teamyeji = us.Teamyeji,
+               //     Riteamyeji = us.Riteamyeji,
+               //     Lsk = us.Lsk,
                     
-                };
-                rt = UsersUtils.Tree(_dbConnect, us, rt);
+               // };
+               // rt = UsersUtils.Tree(_dbConnect, us, rt);
 
-                rtlist.Add(rt);
+               // rtlist.Add(rt);
 
-                string Rtjson = JsonConvert.SerializeObject(rtlist);
-                dic.Add("tree", Rtjson);
-                dic.Add("tjt", ss.Switchtjt.ToString());
+               // string Rtjson = JsonConvert.SerializeObject(rtlist);
+               // dic.Add("tree", Rtjson);
+               // dic.Add("tjt", ss.Switchtjt.ToString());
 
-                diclist.Add(dic);
+               // diclist.Add(dic);
 
-                _res.Done(diclist, "查询成功");
+                _res.Done(new { us, ulist }, "查询成功");
             }
             catch (Exception ex)
             {

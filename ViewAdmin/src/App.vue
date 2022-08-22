@@ -109,14 +109,19 @@
 						    'WalletsTixian_Select_Admin/List'
 						  )
 						">提现货币</el-menu-item>
+						<el-menu-item index="ZhuanzhangSelect" v-if="
+						  permissionChildren(
+						    'WalletsZhuanzhang_Select_Admin/List'
+						  )
+						">转账货币</el-menu-item>
                         <el-menu-item index="ZengjianSelect" v-if="permissionChildren('WalletsZengjian_Admin/List')">货币增减</el-menu-item>
                         <!-- 	<el-menu-item index="Zengjian" v-if="permissionChildren('Zengjian_Admin/List')">货币增减</el-menu-item> -->
                       <!--  <el-menu-item index="Chongzhi" v-if="permissionChildren('WalletsChongzhi_Admin/List')">充值管理</el-menu-item> -->
                         <el-menu-item index="Tixian" v-if="permissionChildren('WalletsTixian_Admin/List')">
                             提现管理</el-menu-item>
-                       <!-- <el-menu-item index="Zhuanzhang" v-if="
+                       <el-menu-item index="Zhuanzhang" v-if="
                 permissionChildren('WalletsZhuanzhang_Admin/List')
-              ">转账管理</el-menu-item> -->
+              ">转账管理</el-menu-item>
                         <!-- <el-menu-item index="Zhuanhuan" v-if="permissionChildren('WalletsZhuanhuan_Admin/List')">转换管理</el-menu-item> -->
                     </el-submenu>
 

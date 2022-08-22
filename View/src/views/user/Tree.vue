@@ -6,15 +6,15 @@
             <div class="cardContent">
                 <!-- <van-field v-model="filterText" label="用户名" placeholder="请输入要查询的用户" /> -->
                 <van-row style="text-align: center">
-                    <van-col span="8">
+                    <van-col span="12">
                         <div class="number">{{ teamcount }}</div>
                         <div class="text">团队人数</div>
                     </van-col>
-					<van-col span="8">
+					<!-- <van-col span="8">
 					    <div class="number">{{ lsk }}</div>
 					    <div class="text">个人业绩</div>
-					</van-col>
-                    <van-col span="8">
+					</van-col> -->
+                    <van-col span="12">
                         <div class="number">{{ riteamyeji }}</div>
                         <div class="text">今日团队业绩</div>
                     </van-col>
@@ -22,8 +22,16 @@
                 </van-row>
             </div>
         </div>
+		
+		<div style="margin-top: 10px;">
+			<van-row v-for="(item,index) in data" :key="index" style="border-bottom: 1px solid #ccc;background-color: #fff;padding: 10px;">
+				<van-col span="16" style="font-weight: 600;">{{item.username}}【{{item.userid}}】</van-col>
+				<van-col span="8" style="">今日买入：{{item.ylsk}}</van-col>
+				<van-col span="24" style="color: #888;font-size: 12px;padding-top: 5px;">注册时间：{{item.rdt}}</van-col>
+			</van-row>
+		</div>
 
-        <div class="tree-block" v-if="tjt">
+        <!-- <div class="tree-block" v-if="tjt">
             <div class="cardContent">
                 <van-cell center title="展开全部">
                     <template #right-icon>
@@ -37,7 +45,7 @@
                     </span>
                 </el-tree>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -119,11 +127,15 @@ export default {
                         });
                         return;
                     }
-                    _this.data = JSON.parse(res.data.data[0].tree);
-                    _this.teamcount = _this.data[0].Teamcount;
-                    _this.teamyeji = _this.data[0].Teamyeji;
-					_this.riteamyeji = _this.data[0].Riteamyeji;
-					 _this.lsk = _this.data[0].Lsk;
+					_this.data = res.data.data.ulist;
+					_this.teamcount = res.data.data.us.teamcount;
+					_this.teamyeji = res.data.data.us.teamyeji;
+					 _this.riteamyeji = res.data.data.us.riteamyeji;
+     //                _this.data = JSON.parse(res.data.data[0].tree);
+     //                _this.teamcount = _this.data[0].Teamcount;
+     //                _this.teamyeji = _this.data[0].Teamyeji;
+					// _this.riteamyeji = _this.data[0].Riteamyeji;
+					//  _this.lsk = _this.data[0].Lsk;
                      console.log(_this.data)
                 }
             );

@@ -1,6 +1,9 @@
 <template>
   <div>
     <HeadBar :title="title" :bg="'transparent'"></HeadBar>
+	<div style="background-color: #f7b226;font-size: 13px;color: #fff;">
+		<div style="padding: 10px;">今日业绩订单笔数：{{jinrinum}}，今日订单总金额：{{jinriprice}}</div>
+	</div>
     <van-tabs title-active-color="#ff4500" :border="false" v-model="active" @click="onClick">
         <!-- <van-tab title="我的商品" name="0"></van-tab> -->
       <van-tab title="全部" name="99"></van-tab>
@@ -34,7 +37,7 @@
           </van-row>
           <div class="jine-wrap-row2">
             <div v-if="item.state > 0">抢购：{{item.qgdate}}</div>
-            <div>确认：{{ item.skdate }}</div>
+            <div v-if="item.state > 2">确认：{{ item.skdate }}</div>
           </div>
           <div class="jine-wrap-row">
             <div>金额：{{ item.jprice }}</div>
@@ -50,7 +53,7 @@
 
 <script>
 import HeadBar from "@/components/HeadBar";
-import UploadPictures from "@/components/UploadPictures";
+
 import Vue from "vue";
 import {
     Tab,
@@ -89,7 +92,6 @@ export default {
   name: '',
   components: {
     HeadBar,
-    UploadPictures
   },
   data () {
     return {
@@ -106,7 +108,9 @@ export default {
       password2: "",
       hid: "",
 	  bbz:'',
-	  time:30 * 60 * 60 * 1000
+	  time:30 * 60 * 60 * 1000,
+	  jinrinum:0,
+	  jinripeice:0
     }
   },
   created() {
@@ -172,7 +176,10 @@ export default {
             })
             return 
           }
-          that.data = res.data.data;
+          that.data = res.data.data.hlist;
+		  that.jinrinum = res.data.data.jinrinum;
+		  that.jinriprice = res.data.data.jinriprice;
+		  
 		  console.log(res.data.data);
         }
       )

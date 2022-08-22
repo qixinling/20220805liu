@@ -46,7 +46,7 @@
 							<img v-if="imageUrl" :src="getimg(imageUrl)" class="avatar" />
 							<i v-else class="el-icon-plus avatar-uploader-icon"></i>
 						</el-upload>
-						<span style="font-size: 12px;color: #777;">{{$config.ImgRatio.Slide.Tip}}</span>
+						<!-- <span style="font-size: 12px;color: #777;">{{$config.ImgRatio.Slide.Tip}}</span> -->
 					</el-form-item>
 				</el-form>
 				<el-row class="elrow">
@@ -102,7 +102,7 @@
 					"Api/Upload/UploadImagesAdmin?token_admin=" +
 					encodeURIComponent(this.$utils.getloc("token_admin")) +
 					"&userid_admin=" +
-					this.$utils.getloc("userid_admin") + "&width=" + this.$config.ImgRatio.Slide.Width + "&height=" + this.$config.ImgRatio.Slide.Height,
+					this.$utils.getloc("userid_admin"),
 			}
 		},
 		created() {
