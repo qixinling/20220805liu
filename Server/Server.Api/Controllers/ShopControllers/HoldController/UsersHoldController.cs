@@ -107,7 +107,9 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         dbHold.Isyy = 1;
                         dbHold.Pid = pid;
                         dbHold.Yajin = yajin;
-                        if(yajin > 0)
+                        dbHold.Reid = us.Reid;
+                        dbHold.Reyongjin = dbHold.Jprice * (decimal)0.05 / 100; ;
+                        if (yajin > 0)
                         {
                             Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, _dbConnect);
                             if (res.Code == 0) { break; }
@@ -208,9 +210,10 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         hold.Busertel = us.Usertel;
                         hold.Qgdate = DateTime.Now;
                         hold.Yajin = yajin;
+                        hold.Reid = us.Reid;
+                        hold.Reyongjin = hold.Jprice * (decimal)0.05 / 100;
 
-
-                        if(yajin > 0)
+                        if (yajin > 0)
                         {
                             Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, dbConnect);
                             if (res.Code == 0) { break; }
@@ -338,9 +341,9 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 }).ToList();
 
 
-                if (lx == 99)//我的订单(买家待付款)
+                if (lx == 99)//我的订单
                 {
-                    hlist = hlist.Where(c => c.Buid == us.Id && c.State != 4).ToList();
+                    hlist = hlist.Where(c => c.Buid == us.Id || c.Uid == us.Id  ).ToList();
                 }
                 if (lx == 1)//我的订单(买家待付款)
                 {
@@ -878,9 +881,8 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
             return _res;
         }
 
-
         /// <summary>
-        /// 画室长推广订单
+        /// 推广订单(显示直推订单)
         /// 
         /// </summary>
         /// <returns></returns>
@@ -898,8 +900,107 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Userid.Equals(userid));
                 if (us == null) { _res.Fail("用户信息出错"); return _res; }
 
-                int jinrinum = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Count();
-                decimal jinriprice = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Sum(c => c.Jprice);
+                
+                decimal yongjin = _dbConnect.DbHold.Where(c => c.Reid == us.Id  && c.Isdelete == 0 && c.Isfc == 0).Sum(c => c.Reyongjin);
+
+                if (state != 99)//
+                {
+                    var hlist = _dbConnect.DbHold.Where(c => c.Reid == us.Id && c.State == state && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Qgdate).Select(c => new
+                    {
+                        c.Id,
+                        c.Holdno,
+                        c.Userid,
+                        c.Username,
+                        c.Usertel,
+                        c.Jid,
+                        c.Jimg,
+                        c.Jname,
+                        c.Jprice,
+                        c.Rishouyi,
+                        c.Zshouyi,
+                        c.State,
+                        Statename = ShopOrderUtils.Getstatename((int)c.State),
+                        c.Buid,
+                        c.Buserid,
+                        c.Busertel,
+                        c.Busername,
+                        c.Zhimg,
+                        c.Dkdate,
+                        c.Skdate,
+                        c.Issj,
+                        c.Sjimg,
+                        c.Sjjine,
+                        c.Qgdate,
+                        c.Reyongjin
+                    }).ToList();
+
+
+
+                    _res.Done(new { yongjin, hlist }, "查询成功");
+                }
+                else
+                {
+                    var hlist = _dbConnect.DbHold.Where(c => c.Reid == us.Id && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Qgdate).Select(c => new
+                    {
+                        c.Id,
+                        c.Holdno,
+                        c.Userid,
+                        c.Username,
+                        c.Usertel,
+                        c.Jid,
+                        c.Jimg,
+                        c.Jname,
+                        c.Jprice,
+                        c.Rishouyi,
+                        c.Zshouyi,
+                        c.State,
+                        Statename = ShopOrderUtils.Getstatename((int)c.State),
+                        c.Buid,
+                        c.Buserid,
+                        c.Busertel,
+                        c.Busername,
+                        c.Zhimg,
+                        c.Dkdate,
+                        c.Skdate,
+                        c.Issj,
+                        c.Sjimg,
+                        c.Sjjine,
+                        c.Qgdate,
+                        c.Reyongjin
+                    }).ToList();
+                    _res.Done(new { yongjin, hlist }, "查询成功");
+                }
+            }
+            catch (Exception ex)
+            {
+                _res.Error("查询异常");
+
+                NLogHelper._.Error(_res.Msg, ex);
+            }
+            return _res;
+        }
+
+        /// <summary>
+        /// 画室长业绩订单
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [TokenCheckFilters]
+        [SignCheckFilters]
+        public Result YjOrderList(JObject data)
+        {
+
+            try
+            {
+                string userid = Convert.ToString(data["userid"]);
+                int state = Convert.ToInt32(data["state"]);
+
+                DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Userid.Equals(userid));
+                if (us == null) { _res.Fail("用户信息出错"); return _res; }
+
+                int jinrinum = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Hdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Count();
+                decimal jinriprice = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Hdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Sum(c => c.Jprice);
 
                 if (state != 99)//
                 {

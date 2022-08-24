@@ -1,22 +1,25 @@
 <template>
 	<div>
-		<HeadBar :title="title" toback="User" :leftarrow="false"></HeadBar>
-		<van-tabs title-active-color="red" :border="false" v-model="active" @click="onClick">
-			<!-- <van-tab title="我的商品" name="0"></van-tab> -->
-			<van-tab title="全部" name="99"></van-tab>
-			<van-tab title="待付款" name="1"></van-tab>
-			<van-tab title="待收款" name="2"></van-tab>
-			<van-tab title="待上架" name="3"></van-tab>
-			<van-tab title="已出售" name="4"></van-tab>
+		<HeadBar :title="title" :fixed="true" toback="User" :leftarrow="false"></HeadBar>
+		<div style="margin-top: 46px;position: fixed;left: 0;right: 0;z-index: 999;">
+			<van-tabs title-active-color="red" :border="false" v-model="active" @click="onClick">
+				<!-- <van-tab title="我的商品" name="0"></van-tab> -->
+				<van-tab title="全部" name="99"></van-tab>
+				<van-tab title="待付款" name="1"></van-tab>
+				<van-tab title="待收款" name="2"></van-tab>
+				<van-tab title="待上架" name="3"></van-tab>
+				<van-tab title="已出售" name="4"></van-tab>
+			
+				<!-- <van-tab title="我的卖单(字画)" name="1"></van-tab> -->
+			</van-tabs>
+		</div>
+		
 
-			<!-- <van-tab title="我的卖单(字画)" name="1"></van-tab> -->
-		</van-tabs>
-
-		<div class="cardBox">
+		<div class="cardBox" style="padding-top: 100px;">
 			<div style="margin-bottom:10px" class="cardContent" v-for="(item,index) in data" :key="index">
 				<van-row style="padding: 5px;font-size: 13px;">
 					<van-col span="18">订单号:{{item.holdno}}</van-col>
-					<van-col span="6" style="text-align: right;color: #FC4702;"></van-col>
+					<van-col span="6" style="text-align: right;color: #FC4702;"><span v-if="active == 99">{{item.statename}}</span></van-col>
 				</van-row>
 				<van-row>
 					<van-col span="8">
@@ -547,6 +550,7 @@
 	.upload {
 		font-size: 13px;
 		padding: 5px;
+		
 	}
 
 	/deep/ .van-field__control {

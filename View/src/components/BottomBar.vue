@@ -11,7 +11,7 @@
 				<template #icon="props">
 					<img :src="props.active ? require('@/assets/img/t2_a.png') : require('@/assets/img/t2.png')" width="18" height="18" />
 				</template>
-				全部订单
+				订单
 			</van-tabbar-item>
 			<!-- <van-tabbar-item icon="shop-o" @click="ontips">商城</van-tabbar-item> -->
 			<!-- <van-tabbar-item icon="apps-o" @click="ontips">矿池</van-tabbar-item> -->
@@ -23,7 +23,7 @@
 				<template #icon="props">
 					<img :src="props.active ? require('@/assets/img/t3_a.png') : require('@/assets/img/t3.png')" width="18" height="18" />
 				</template>
-				分销中心
+				中心
 			</van-tabbar-item>
 			<van-tabbar-item icon="manager" name="/User" to="/User">
 				<template #icon="props">

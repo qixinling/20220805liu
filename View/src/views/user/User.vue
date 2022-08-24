@@ -54,16 +54,17 @@
                 <!-- <van-cell title="我的团队" icon="friends-o " value="" is-link to="./Tree" /> -->
                 <van-cell title="邀请好友" icon="qr" is-link :to="'./Qrcode?recode=' + usinfo.recode +'&usertel=' + usinfo.usertel +'&tx=' +usinfo.tx" />
                 <van-cell title="绑定信息" icon="setting-o" is-link to="UserInfo" value="" />
+				 <van-cell title="账单明细" icon="todo-list-o" is-link to="Bill" value="" />
                <van-cell title="消息" icon="chat-o" is-link to="./Msg">
                	<div v-if="msgCount > 0">{{ msgCount }} 未读</div>
                </van-cell>
 			   <!-- <van-cell title="常见问题" icon="gift-o" is-link to="Question" value="" /> -->
-			   <van-cell title="收货地址" icon="location-o" is-link to="Address" value="" />
+			  <!-- <van-cell title="收货地址" icon="location-o" is-link to="Address" value="" /> -->
             </div>
         </div>
 
         <div class="btn-box">
-            <van-button style="background-color: #ff4500; color: #fff; border-radius:5px" block @click="logout">切换账号</van-button>
+            <van-button style="background-color: #ff4500; color: #fff; border-radius:5px" block @click="logout">退出登录</van-button>
         </div>
 
         <Login></Login>

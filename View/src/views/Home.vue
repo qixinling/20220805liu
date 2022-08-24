@@ -56,9 +56,9 @@
         <img src="@/assets/img/nav2.png" width="70" height="70" />
         <div>体验区</div>
       </div>
-      <div @click="KfClick()">
+      <div  @click="tolink('yuyue')">
         <img src="@/assets/img/nav3.png" width="70" height="70" />
-        <div>待开放</div>
+        <div>预约区</div>
       </div>
     </div>
   </div>
@@ -69,7 +69,7 @@
       画家资料
     </div>
     <div class="huajia-list">
-      <div class="huajia-item" v-for="item in data" :key="item.id" @click="tolink('TeachersDetails?tid=' + item.id)">
+      <div class="huajia-item" v-for="item in tlist" :key="item.id" @click="tolink('TeachersDetails?tid=' + item.id)">
         <img :src="getimg(item.tximg)" width="80" height="80"/>
         <div>{{item.name}}</div>
       </div>
@@ -138,7 +138,7 @@ export default {
   data() {
     return {
       slidelist: [],
-      data: [],
+      tlist: [],
 	    marqueemsg: "",
 	    cshow:false,
 	    sshow:false,
@@ -202,8 +202,8 @@ export default {
 	                });
 	                return;
 	            }
-	            _this.data = res.data.data;
-				console.log(_this.data);
+	            _this.tlist = res.data.data;
+				console.log( _this.tlist);
 	          
 	        }
 	    );
@@ -560,6 +560,7 @@ font-weight: bold;
 .huajia-list {
   white-space: nowrap;
   overflow-y: auto;
+  text-align: center;
 }
 
 .huajia-item {

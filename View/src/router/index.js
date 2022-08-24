@@ -251,7 +251,7 @@ const routes = [{
 		name: "Bouns",
 		component: resolve => require(["@/views/wallet/Bouns"], resolve),
 		meta: {
-			title: "收益"
+			title: "佣金明细"
 		}
 	},
 	{
@@ -460,6 +460,14 @@ const routes = [{
 		component: resolve => require(["@/views/auction/Shoukuan"], resolve),
 		meta: {
 			title: "收款"
+		}
+	},
+	{
+		path: "/YjOrder",
+		name: "YjOrder",
+		component: resolve => require(["@/views/auction/YjOrder"], resolve),
+		meta: {
+			title: "业绩订单"
 		}
 	},
 	{

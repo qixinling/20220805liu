@@ -2,16 +2,19 @@
     <div class="fenxiao">
         <div class="hader-nav">分销中心</div>
         <div style="background-color:#f7f7f7;padding-bottom:10px">
-            <div class="userinfo">
-                <img :src="usinfo.tx" width="70" height="70" style="border-radius:8px" />
-                <div style="margin-left:20px">
-                    <div style="font-size:16px;margin-bottom:5px">{{usinfo.userid}}</div>
-                    <div>推荐人：{{usinfo.rename}}</div>
-                    <div v-if="usinfo.ulevel == 0">会员【{{usinfo.ulevelname}}】</div>
-                    <div v-if="usinfo.ulevel == 1">{{usinfo.studioname }}【{{usinfo.ulevelname}}画室长】</div>
-                    <!-- <div v-if="usinfo.mystudiocard">我的画室长：{{usinfo.mystudiocard}}</div> -->
-                </div>
-            </div>
+            <van-row style="background-color: #ff7606;color: #fff;padding: 10px;">
+				<van-col span="19" style="display: flex;align-items: center;">
+					<img :src="usinfo.tx" width="70" height="70" style="border-radius:8px" />
+					<div style="margin-left:20px;padding-top: 10px;">
+					    <div style="font-size:16px;margin-bottom:5px">{{usinfo.userid}}</div>
+					    <div>推荐人：{{usinfo.rename}}</div>
+					    <div v-if="usinfo.ulevel == 0">会员【{{usinfo.ulevelname}}】</div>
+					    <div v-if="usinfo.ulevel == 1">{{usinfo.studioname }}【{{usinfo.ulevelname}}画室长】</div>
+					</div>
+				</van-col>
+				<van-col span="5">今日汇率<div style="padding-top: 5px;">1：{{hvbili}}</div></van-col>
+			</van-row>
+          
             <div class="qrcode">
                 我的邀请码：{{usinfo.recode}}
                 <span @click="CopyLink(usinfo.recode)">复制</span>
@@ -39,7 +42,7 @@
             <div class="nav-block">
                 <div class="nav-item" @click="tolink('Bouns')">
                     <van-icon name="point-gift-o" size="30" color="#ff035b" />
-                    <div class="nav-item-label">推广佣金</div>
+                    <div class="nav-item-label">分享佣金</div>
                 </div>
                 <div class="nav-item" @click="tolink('TgOrder')">
                     <van-icon name="shop-o" size="30" color="#55aaff" />
@@ -73,7 +76,7 @@
 			<div style="padding: 10px;font-size: 14px;">我的画室长：{{usinfo.mystudiocard}}</div>
 		</div> -->
 	    <div class="cell-list">
-	    	<van-cell title="业绩统计" icon="manager" value="" is-link to="./TgOrder" />
+	    	<van-cell title="业绩统计" icon="manager" value="" is-link to="./YjOrder" />
 	    	<van-cell v-if="usinfo.ulevel == 1" title="画室控制台"  icon="friends" value="" is-link to="./Kongzhi" />
 	    </div>
 
@@ -113,7 +116,8 @@ export default {
             msgCount: 0,
             marqueemsg: "",
             defaulttx: require("../../assets/img/tx.png"),
-			zjine:0
+			zjine:0,
+			hvbili:0
         };
     },
     created() {
@@ -158,7 +162,12 @@ export default {
 		                return;
 		            }
 		            _toast.clear();
-		            _this.wallet = res.data.data.ulist[0];
+					res.data.data.ulist.forEach(item=>{
+						if(item.cid == 1){
+							  _this.wallet = item;
+						}
+					})
+					_this.hvbili = res.data.data.huilv;
 					
 		        }
 		    );
@@ -341,8 +350,8 @@ export default {
 
 .userinfo {
     padding: 10px;
-    display: flex;
-    align-items: center;
+		display: flex;
+		/* align-items: center; */
     background-color: #ff7606;
 }
 
@@ -352,7 +361,7 @@ export default {
 }
 
 .qrcode {
-    padding: 5px 10px;
+    padding: 10px;
     margin-bottom: 10px;
     font-size: 14px;
     background-color: #fff;

@@ -9,6 +9,7 @@ using static Server.Api.Filters;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Server.Api.Method;
+using Server.Api.Utils;
 
 namespace Server.Api.Controllers.WalletsControllers
 {
@@ -92,7 +93,10 @@ namespace Server.Api.Controllers.WalletsControllers
                 if(us == null) { return _res.Fail("用户信息出错"); }
                 List<DbWallets> ulist = new WalletsMethod(_dbConnect).GetListIncludeCoin().Where(u => u.Uid == id && u.CidNavigation.State == 1).OrderByDescending(w => w.Cid).ToList();
 
-                _res.Done(new { ulist , us.Djxyz}, "查询成功");
+                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
+                decimal huilv = bonusDic["bs3"];
+
+                _res.Done(new { ulist , huilv }, "查询成功");
             }
             catch (Exception ex)
             {

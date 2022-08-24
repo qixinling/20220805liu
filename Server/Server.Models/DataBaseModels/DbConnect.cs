@@ -540,9 +540,18 @@ namespace Server.Models.DataBaseModels
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .HasComment("用于判断抢购");
 
+                entity.Property(e => e.Reid)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("reid")
+                    .HasDefaultValueSql("'0'");
+
                 entity.Property(e => e.Repath)
                     .HasMaxLength(255)
                     .HasColumnName("repath");
+
+                entity.Property(e => e.Reyongjin)
+                    .HasPrecision(18, 2)
+                    .HasColumnName("reyongjin");
 
                 entity.Property(e => e.Rishouyi)
                     .HasPrecision(10, 2)

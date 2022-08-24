@@ -1,8 +1,8 @@
 <template>
   <div>
-    <HeadBar title="推广订单" :bg="'transparent'"></HeadBar>
+    <HeadBar :title="title" :bg="'transparent'"></HeadBar>
 	<div style="background-color: #f7b226;font-size: 13px;color: #fff;">
-		<div style="padding: 10px;">累计佣金：+{{yongjin}}</div>
+		<div style="padding: 10px;">今日业绩订单笔数：{{jinrinum}}，今日订单总金额：{{jinriprice}}</div>
 	</div>
     <van-tabs title-active-color="#ff4500" :border="false" v-model="active" @click="onClick">
         <!-- <van-tab title="我的商品" name="0"></van-tab> -->
@@ -32,13 +32,16 @@
                 <div class="content-name">{{ item.jname }}</div>
                 <div class="maijia-label"><span>买家</span>{{item.busername}}({{item.busertel}})</div>
                 <div class="maijia-label2"><span>卖家</span>{{item.username}}({{item.usertel}})</div>
-				<div class="maijia-label3"><span>买入价格</span>{{item.jprice}}</div>
-				<div class="maijia-label3"><span>预计佣金</span>{{item.reyongjin}}</div>
               </div>
             </van-col>
           </van-row>
           <div class="jine-wrap-row2">
-            <div v-if="item.state > 0">买入时间：{{item.qgdate}}</div>
+            <div v-if="item.state > 0">抢购：{{item.qgdate}}</div>
+            <div v-if="item.state > 2">确认：{{ item.skdate }}</div>
+          </div>
+          <div class="jine-wrap-row">
+            <div>金额：{{ item.jprice }}</div>
+            <div>上架费：{{ item.sjjine }}</div>
           </div>
     
         </div>
@@ -106,7 +109,7 @@ export default {
       hid: "",
 	  bbz:'',
 	  time:30 * 60 * 60 * 1000,
-	  yongjin:0,
+	  jinrinum:0,
 	  jinripeice:0
     }
   },
@@ -159,7 +162,7 @@ export default {
       let that = this
 	   that.data=[];
       that.$request.post(
-        "api/UsersHold/TgOrderList",
+        "api/UsersHold/YjOrderList",
         {
           token: that.$utils.getloc("token"),
           userid: that.$utils.getloc("userid"),
@@ -174,8 +177,8 @@ export default {
             return 
           }
           that.data = res.data.data.hlist;
-		  that.yongjin = res.data.data.yongjin;
-		 
+		  that.jinrinum = res.data.data.jinrinum;
+		  that.jinriprice = res.data.data.jinriprice;
 		  console.log(res.data.data);
         }
       )
@@ -334,11 +337,6 @@ export default {
 .maijia-label2 span {
   margin-right: 8px;
   background-color: #027D04;
-  color: #fff;
-}
-.maijia-label3 span {
-  margin-right: 8px;
-  background-color: #f7b226;
   color: #fff;
 }
 

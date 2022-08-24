@@ -1,6 +1,6 @@
 <template>
 	<div style="margin-bottom: 200px">
-		<PageTitle title="添加" :btn="false" :excel="false"></PageTitle>
+		<PageTitle title="修改" :btn="false" :excel="false"></PageTitle>
 
 		<div class="cardbox">
 			<div class="cardcontent">

@@ -24,9 +24,9 @@
 			<div style="padding: 10px;font-size: 14px;" v-if="site.length > 0">
 				<span style="padding-right:10px">营业中 营业时间：{{site[1].sdate}} - {{site[1].edate}}</span>
 				
-				<van-button v-if="site[0].ispay == 1 && hsisyy == 1 && week >= 3 && week <= 7" size="mini"  color="#EC5624" @click="yuyue">
+				<!-- <van-button v-if="site[0].ispay == 1 && hsisyy == 1 && week >= 3 && week <= 7" size="mini"  color="#EC5624" @click="yuyue">
 					预约
-				</van-button>
+				</van-button> -->
 			</div>
 		</div>
 		<!-- <div class="fenqu-wrap" v-if="site.id == 1">
