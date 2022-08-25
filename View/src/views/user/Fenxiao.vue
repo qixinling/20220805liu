@@ -42,19 +42,27 @@
             <div class="nav-block">
                 <div class="nav-item" @click="tolink('Bouns')">
                     <van-icon name="point-gift-o" size="30" color="#ff035b" />
-                    <div class="nav-item-label">分享佣金</div>
+                    <div class="nav-item-label">
+						分享佣金
+						<div style="font-size: 13px;color: #999"><span style="color: #f4c40b;">{{yjcount}}</span>元</div>
+					</div>
+					
+				
                 </div>
                 <div class="nav-item" @click="tolink('TgOrder')">
                     <van-icon name="shop-o" size="30" color="#55aaff" />
-                    <div class="nav-item-label">推广订单</div>
+                    <div class="nav-item-label">推广订单
+					<div style="font-size: 13px;color: #999"><span style="color: #f4c40b;">{{tgcount}}</span>笔</div></div>
                 </div>
                 <div class="nav-item" @click="tolink('Tixianrecord')">
                     <van-icon name="shop-collect-o" size="30" color="#ffd53a" />
-                    <div class="nav-item-label">提现明细</div>
+                    <div class="nav-item-label">提现明细
+					<div style="font-size: 13px;color: #999"><span style="color: #f4c40b;">{{txcount}}</span>笔</div></div>
                 </div>
                 <div class="nav-item" @click="tolink('Tree')">
                     <van-icon name="friends-o" size="30" color="#ff5500" />
-                    <div class="nav-item-label">我的粉丝</div>
+                    <div class="nav-item-label">我的粉丝
+					<div style="font-size: 13px;color: #999"><span style="color: #f4c40b;">{{usinfo.teamcount}}</span>人</div></div>
                 </div>
             </div>
         </div>
@@ -117,7 +125,10 @@ export default {
             marqueemsg: "",
             defaulttx: require("../../assets/img/tx.png"),
 			zjine:0,
-			hvbili:0
+			hvbili:0,
+			yjcount:0,
+			tgcount:0,
+			txcount:0
         };
     },
     created() {
@@ -130,7 +141,7 @@ export default {
                 //子组件调用加载
                 this.getdata();
 				this.Wallet_GetWallet();
-                // this.getordernum();
+                 this.gettongji();
             }
         },
         getimg: function (imgname) {
@@ -197,10 +208,37 @@ export default {
                     // console.log(_this.usinfo)
                    // _this.zjine = Number(_this.usinfo.mey) + Number(_this.usinfo.jindou);
                     _this.userid = _this.usinfo.userid;
+					console.log( _this.usinfo);
                     _this.msgCount = _this.usinfo.msgcount;
                 }
             );
         },
+		gettongji: function () {
+		    var _this = this;
+		    _this.$request.post(
+		        "api/Users/Tongji",
+		        {
+		            token: _this.$utils.getloc("token"),
+		            userid: _this.$utils.getloc("userid"),
+					uid: _this.$utils.getloc("id"),
+		        },
+		        (res) => {
+		            if (res.data.code == 0) {
+		                _this.$dialog.alert({
+		                    title: "提示",
+		                    message: res.data.msg,
+		                });
+		                return;
+		            }
+					
+					_this.yjcount = res.data.data.yjcount;
+					_this.tgcount = res.data.data.tgcount;
+					_this.txcount = res.data.data.txcount;
+					
+		            
+		        }
+		    );
+		},
  
         tolink(path) {
             this.$router.push(path)
@@ -416,7 +454,7 @@ export default {
     padding-left: 15px;
     height: 66px;
     width: 50%;
-    display: flex;
+   display: flex;
     align-items: center;
     font-size: 14px;
 }

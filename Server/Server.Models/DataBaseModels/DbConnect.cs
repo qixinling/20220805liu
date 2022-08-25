@@ -1727,6 +1727,10 @@ namespace Server.Models.DataBaseModels
                     .HasPrecision(18, 2)
                     .HasColumnName("czmin");
 
+                entity.Property(e => e.Jydays)
+                    .HasMaxLength(255)
+                    .HasColumnName("jydays");
+
                 entity.Property(e => e.Marqueemsg)
                     .IsRequired()
                     .HasColumnName("marqueemsg");

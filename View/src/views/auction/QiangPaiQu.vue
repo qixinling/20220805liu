@@ -24,9 +24,9 @@
 			<div style="padding: 10px;font-size: 14px;" v-if="site.length > 0">
 				<span style="padding-right:10px">营业中 营业时间：{{site[1].sdate}} - {{site[1].edate}}</span>
 				
-				<!-- <van-button v-if="site[0].ispay == 1 && hsisyy == 1 && week >= 3 && week <= 7" size="mini"  color="#EC5624" @click="yuyue">
+				<van-button v-if="site[0].ispay == 1 && hsisyy == 1" size="mini"  color="#EC5624" @click="yuyue">
 					预约
-				</van-button> -->
+				</van-button>
 			</div>
 		</div>
 		<!-- <div class="fenqu-wrap" v-if="site.id == 1">
@@ -51,17 +51,25 @@
 			<div style="padding: 5px 5px 60px" class="goods-content">
 				<van-row>
 					<van-col style="padding: 5px" span="8" v-for="(item, index) in data" :key="index">
-						<div class="goods-card">
-							<div class="goodsimg">
-								<img :src="getimg(item.jimg)" style="width: 100%" />
-							</div>
+						<div  style="position:absolute;z-index:1;width:125px;">
+							<img :src="getimg(item.jimg)" style="width: 100%" />
+						</div>
+						<div v-if="item.buid" style="position:absolute;z-index:99;padding:10px;">
+								<img src="../../assets/img/zg.jpg"  style="width: 100px;" />	
+	
+						</div>
+						<div class="goods-card"  >
+							
 							<div class="goods-content">
 								<div class="goodsname">{{ item.jname }}</div>
 								<div class="goodsprice">
 									<span>￥{{ item.jprice }}</span>
 								</div>
 								<div class="goodsother">
-									<van-button block size="small" style="background-color:#ff4500;color:#fff" @click="qiangpai(item.id)">
+									<van-button v-if="item.state == 0" block size="small" style="background-color:#ff4500;color:#fff" @click="qiangpai(item.id)">
+										抢购
+									</van-button>
+									<van-button v-if="item.state > 0" block size="small" style="background-color:#999;color:#fff" >
 										抢购
 									</van-button>
 								</div>
@@ -193,6 +201,7 @@
 						}
 						that.week = res.data.data.week;
 						that.data = res.data.data.hlist;
+						console.log(that.data);
 						that.pagecount = res.data.data.pagecount;
 						// if(list.length > 0){
 						// 	 that.finished = false
@@ -297,9 +306,14 @@
 </script>
 
 <style scoped>
+	.overlay {
+	position:absolute;
+	 z-index:999;
+	}
+	
 	.qiangpaiqu {
 		min-height: 100vh;
-		background-color: #fff;
+		/* background-color: #fff; */
 	}
 
 	.fenqu-wrap {
@@ -367,6 +381,8 @@
 	.goods-card {
 		overflow: hidden;
 		background-color: #fff;
+		padding-top: 130px;
+		/* border-radius: 5px; */
 		/* box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px; */
 	}
 

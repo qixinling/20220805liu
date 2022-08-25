@@ -30,11 +30,11 @@
           <van-cell title="买家姓名" :value="item.busername"/>
 		  <van-cell title="买家电话" :value="item.busertel" />
         </div>
-        <!-- <div class="upload">
+        <div class="upload" v-if="item.sjimg">
           <div style="margin-bottom:5px">上架支付凭证</div>
 		  <img v-if="item.sjimg" :src="getimg(item.sjimg)" style="width: 100%;height: 250px;"/>
 		 <div v-else style="padding: 20px;color: #888;text-align: center;">暂未上传凭证</div> 
-        </div> -->
+        </div>
 		<van-row>
 			<!-- <van-col span="12" style="padding: 5px;"><van-button size="normal" style="background-color: red; color: #fff" block @click="Sellshensu(item.id)">申诉</van-button></van-col> -->
 			<van-col span="24" v-if="item.state == 3 && item.issj == 1" style="padding: 5px;"><van-button size="normal" style="background-color: #FC4702; color: #fff" block @click="ShPass(item.id)">审核通过</van-button></van-col>

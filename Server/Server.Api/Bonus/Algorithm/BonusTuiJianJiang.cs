@@ -43,7 +43,7 @@ namespace Server.Api.Bonus.Algorithm
                 if (reus == null) { return Res; }
                 Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(dbConnect);
 
-                decimal amount = Jine * (decimal)0.5 / 100;
+                decimal amount = Jine * bonusDic["bs4"] / 100;
                 if (amount > 0)
                 {
                     

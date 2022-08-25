@@ -110,7 +110,7 @@ export default {
 	  bbz:'',
 	  time:30 * 60 * 60 * 1000,
 	  jinrinum:0,
-	  jinripeice:0
+	  jinriprice:0
     }
   },
   created() {

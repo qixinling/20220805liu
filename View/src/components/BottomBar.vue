@@ -23,7 +23,7 @@
 				<template #icon="props">
 					<img :src="props.active ? require('@/assets/img/t3_a.png') : require('@/assets/img/t3.png')" width="18" height="18" />
 				</template>
-				中心
+				分销
 			</van-tabbar-item>
 			<van-tabbar-item icon="manager" name="/User" to="/User">
 				<template #icon="props">

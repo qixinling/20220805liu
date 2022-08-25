@@ -107,6 +107,7 @@ namespace Server.Api.Controllers.UsersControllers
                         if(users.Ulevel == 0)
                         {
                             DbUsers reus = _dbConnect.DbUsers.FirstOrDefault(c => c.Id == users.Mystudioid);
+                           if(reus.StudioCard == null || reus.StudioName == null) { _res.Fail("画室信息错误"); return _res; }
                             if (!reus.StudioCard.Equals(studiocard)) { _res.Fail("所属画室编号错误"); return _res; }
 
                         }
@@ -1064,6 +1065,7 @@ namespace Server.Api.Controllers.UsersControllers
                     dic.Add("studioname", us.StudioName);
                     dic.Add("studiocard", us.StudioCard);
                     dic.Add("riteamyeji", us.Riteamyeji.ToString());
+                    dic.Add("teamcount", us.Teamcount.ToString());
 
                     if (us.Mystudioid != 0)
                     {
@@ -1318,5 +1320,41 @@ namespace Server.Api.Controllers.UsersControllers
             return _res;
         }
 
+
+        /// <summary>
+        ///统计
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [TokenCheckFilters]
+        [SignCheckFilters]
+        public Result Tongji(JObject data)
+        {
+
+            try
+            {
+                
+                int uid = Convert.ToInt32(data["uid"]);
+
+                DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Id == uid);
+                if(us == null) { return _res.Fail("用户信息出错"); }
+
+                decimal yjcount = _dbConnect.DbBonusSource.Where(c => c.Uid == uid && c.State == 1).Sum(c => c.Jine);
+                int tgcount = _dbConnect.DbHold.Where(c => c.Reid == us.Id && c.Isdelete == 0 && c.Isfc == 0).Count();
+                decimal txcount = _dbConnect.DbWalletsTixian.Include(c => c.UidNavigation).Where(c => c.UidNavigation.Mystudioid == uid && c.Isdelete == 0).Count();
+
+
+                _res.Done(new { yjcount, tgcount , txcount }, "");
+
+            }
+
+            catch (Exception ex)
+            {
+                _res.Error("统计数据异常");
+
+                NLogHelper._.Error(_res.Msg, ex);
+            }
+            return _res;
+        }
     }
 }

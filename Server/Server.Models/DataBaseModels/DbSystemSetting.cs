@@ -32,5 +32,6 @@ namespace Server.Models.DataBaseModels
         public decimal Zzmax { get; set; }
         public int Zzbs { get; set; }
         public int Zhbs { get; set; }
+        public string Jydays { get; set; }
     }
 }

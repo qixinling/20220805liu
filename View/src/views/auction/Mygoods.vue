@@ -41,7 +41,7 @@
 					<div>金额：{{ item.jprice }}</div>
 					<div>上架费：{{ item.sjjine }}</div>
 				</div>
-				<div class="jine-wrap-row" v-if="uid == item.buid && active == 3">
+				<div class="jine-wrap-row" v-if="uid == item.buid && (active == 3 || active == 99)">
 					<div>付款方式</div>
 					<div>
 						<van-radio-group v-model="lx">
@@ -66,7 +66,7 @@
 					</div>
 					
 				</div>
-				<div class="upload" v-if="item.state == 3 && item.uid != uid && lx == 2">
+				<div class="upload" v-if="item.state == 3  && lx == 2">
 					<div>上架支付凭证</div>
 					<UploadPictures
 						:haveImgList="item.sjimg?[{url: getimg(item.sjimg)}]: haveImgList[index] ? [{url: getimg(haveImgList[index])}] : []"

@@ -84,9 +84,28 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
 
                 decimal yajin = bonusDic["bs2"];
+                decimal mey = bonusDic["bs4"];
 
                 DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c => c.Uid == us.Id && c.Cid == 1);
                 if(uw.Jine < yajin) { return _res.Fail("画贝余额不足"); }
+
+                DbSystemSetting ss = _dbConnect.DbSystemSetting.FirstOrDefault();
+                string jyday = ss.Jydays;
+                int week = (int)DateTime.Now.DayOfWeek;
+                if (week == 0) { week = 7; }
+                if (week == 7)
+                {
+                    week = 1;
+                }
+                else
+                {
+                    week = 1 + week;
+                }
+                decimal bili = (decimal)2.5;
+                if (!jyday.Contains(week.ToString()))
+                {
+                    bili = (decimal)1.7;
+                }
                 do
                 {
                     using DbConnect dbConnect = DbConnectUtils.GetDbContext();
@@ -108,7 +127,8 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         dbHold.Pid = pid;
                         dbHold.Yajin = yajin;
                         dbHold.Reid = us.Reid;
-                        dbHold.Reyongjin = dbHold.Jprice * (decimal)0.05 / 100; ;
+                        dbHold.Reyongjin = dbHold.Jprice * mey / 100;
+                        dbHold.Sjjine = dbHold.Jprice * bili / 100;
                         if (yajin > 0)
                         {
                             Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, _dbConnect);
@@ -189,9 +209,28 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
 
                 decimal yajin = bonusDic["bs2"];
-               
+                decimal mey = bonusDic["bs4"];
                 DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c => c.Uid == us.Id && c.Cid == 1);
                 if (uw.Jine < yajin) { return _res.Fail("画贝余额不足"); }
+
+                DbSystemSetting ss = _dbConnect.DbSystemSetting.FirstOrDefault();
+                string jyday = ss.Jydays;
+                int week = (int)DateTime.Now.DayOfWeek;
+                if(week == 0) { week = 7; }
+                if (week == 7)
+                {
+                    week = 1;
+                }
+                else
+                {
+                    week = 1 + week;
+                }
+
+                decimal bili = (decimal)2.5;
+                if (!jyday.Contains(week.ToString()))
+                {
+                    bili = (decimal)1.7;
+                }
 
                 do
                 {
@@ -211,8 +250,8 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                         hold.Qgdate = DateTime.Now;
                         hold.Yajin = yajin;
                         hold.Reid = us.Reid;
-                        hold.Reyongjin = hold.Jprice * (decimal)0.05 / 100;
-
+                        hold.Reyongjin = hold.Jprice * mey / 100;
+                        hold.Sjjine = hold.Jprice * bili / 100;
                         if (yajin > 0)
                         {
                             Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, dbConnect);
@@ -273,8 +312,22 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 int pagecount = 0;
                 DbSite site = _dbConnect.DbSite.FirstOrDefault(c => c.Id == 2 && c.Ispay == 1);//开抢的时段
                 int week = (int)DateTime.Now.DayOfWeek;
-                
-                hlist = _dbConnect.DbHold.Where(c => c.State == 0 && c.Isfc == 0 && (DateTime.Now.Date > c.Sjdate.Date || c.Issd == 1 || c.Iscf ==1) && c.Hsuid == us.Mystudioid &&  c.Isdelete == 0).OrderByDescending(c => c.Jprice).ToList();
+                if(week == 0)
+                {
+                    week = 7;
+                }
+                //判断可以显示在大厅的条件
+                //((DateTime.Now.Date > c.Hdate.Date || c.Iscf == 1 || c.Issd == 1) && c.State == 0  )
+                //判断当天已出售但依旧可以显示在大厅的条件
+                //(DateTime.Now.Date == c.Hdate.Date && c.State > 0 )
+
+                DbSystemSetting ss = _dbConnect.DbSystemSetting.FirstOrDefault();
+                string jyday = ss.Jydays;
+                if (jyday.Contains(week.ToString()) && site.Ispay == 1)
+                {
+                    hlist = _dbConnect.DbHold.Where(c => c.Isfc == 0 && (((DateTime.Now.Date > c.Hdate.Date || c.Iscf == 1 || c.Issd == 1) && c.State == 0) || (DateTime.Now.Date == c.Hdate.Date && c.State > 0)) && c.Hsuid == us.Mystudioid && c.Isdelete == 0).OrderByDescending(c => c.Jprice).ToList();
+                }
+              
 
                 pagecount = (int)Math.Ceiling((float)hlist.Count / pageSize);
                 hlist = hlist.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
@@ -689,6 +742,10 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
 
                 decimal zshouyi = hold.Jprice * 4 / 100;//新一轮打款金额打款
                 decimal zjine = hold.Jprice + zshouyi;
+
+                
+                
+
                 decimal sjjine = zjine * (decimal)2.5 / 100;
 
                 hold.State = 4;//交易结束，开始新的卖单

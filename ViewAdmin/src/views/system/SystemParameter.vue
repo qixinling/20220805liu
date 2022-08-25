@@ -3,7 +3,7 @@
 		<PageTitle title="系统参数" :btn="false" :excel="false"></PageTitle>
 		<div class="cardbox">
 			<div class="cardcontent">
-				<el-form label-width="80px">
+				<el-form label-width="100px">
 					<el-tabs :tab-position="'left'">
 						<el-tab-pane label="系统设置">
 							<el-form-item label="系统开关">
@@ -25,6 +25,11 @@
 							<el-form-item label="滚动消息">
 								<el-input type="textarea" :rows="2" placeholder="请输入滚动消息" v-model="ss.marqueemsg">
 								</el-input>
+							</el-form-item>
+							<el-form-item label="交易星期数">
+								<el-input  placeholder="交易星期数,填写1-7数字,逗号分割" v-model="ss.jydays">
+								</el-input>
+								<span style="font-size: 12px;color: red;">提示:交易星期数,填写1-7数字,逗号分割</span>
 							</el-form-item>
 							<!-- <el-form-item label="验证码">
 								<el-switch :active-value="1" :inactive-value="0" v-model="ss.czbs"></el-switch>
