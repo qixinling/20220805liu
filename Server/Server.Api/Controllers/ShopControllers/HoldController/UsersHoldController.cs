@@ -64,11 +64,16 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                DbPricerange price = _dbConnect.DbPricerange.FirstOrDefault(c => c.Id == pid);
                if (price == null) { return _res.Fail("价位信息出错"); }
 
-               DbHold hold = _dbConnect.DbHold.FirstOrDefault(c => c.Isyy == 1&& c.Isdelete == 0 && c.Buid == uid && c.Qgdate.Date == DateTime.Now.Date );
+                DbSite site = _dbConnect.DbSite.FirstOrDefault(c => c.Id == 1 && c.Ispay == 1);
+                if(site == null) { return _res.Fail("当前时间段不可预约"); }
+              
+
+                DbHold hold = _dbConnect.DbHold.FirstOrDefault(c => c.Isyy == 1&& c.Isdelete == 0 && c.Buid == uid && c.Qgdate.Date == DateTime.Now.Date );
                 if(hold != null) { return _res.Fail("今天已预约过"); }
 
+                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
                 decimal jprice = _dbConnect.DbHold.Where(c=>c.Buid == uid && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0).Sum(c=>c.Jprice);
-                if(jprice >= 31888) { return _res.Fail("今日抢购已达上限"); }
+                if(jprice >= bonusDic["bs5"]) { return _res.Fail("今日抢购已达上限"); }
 
                 DbHold dbHold = null;
                 if (pid < 4)
@@ -81,7 +86,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 }
                 if (dbHold == null) { return _res.Fail("该预约已满"); }
 
-                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
+               
 
                 decimal yajin = bonusDic["bs2"];
                 decimal mey = bonusDic["bs4"];
@@ -193,8 +198,10 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Id == uid);
                 if (us == null) { return _res.Fail("用户信息出错"); }
 
+                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
+
                 decimal jprice = _dbConnect.DbHold.Where(c => c.Buid == uid && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0).Sum(c => c.Jprice);
-                if (jprice >= 31888) { return _res.Fail("今日抢购已达上限"); }
+                if (jprice >= bonusDic["bs5"]) { return _res.Fail("今日抢购已达上限"); }
 
                 //判断单子ID是否存在,不存在时该用户是第一个人,锁住hid不让其他人进入
                 if (!_redis.StringGet(hid.ToString()).IsNull) { return _res.Fail("抢单失败"); }
@@ -206,7 +213,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 if (hold.State != 0) { return _res.Fail("该单已售出"); }
                 if (hold.Isdelete != 0) { return _res.Fail("该单已删除"); }
 
-                Dictionary<string, decimal> bonusDic = SystemSettingBonusUtils.GetBonusParameter(_dbConnect);
+               
 
                 decimal yajin = bonusDic["bs2"];
                 decimal mey = bonusDic["bs4"];
@@ -323,9 +330,9 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
 
                 DbSystemSetting ss = _dbConnect.DbSystemSetting.FirstOrDefault();
                 string jyday = ss.Jydays;
-                if (jyday.Contains(week.ToString()) && site.Ispay == 1)
+                if (jyday.Contains(week.ToString()) && site != null)
                 {
-                    hlist = _dbConnect.DbHold.Where(c => c.Isfc == 0 && (((DateTime.Now.Date > c.Hdate.Date || c.Iscf == 1 || c.Issd == 1) && c.State == 0) || (DateTime.Now.Date == c.Hdate.Date && c.State > 0)) && c.Hsuid == us.Mystudioid && c.Isdelete == 0).OrderByDescending(c => c.Jprice).ToList();
+                    hlist = _dbConnect.DbHold.Where(c => c.Isfc == 0 && (((DateTime.Now.Date > c.Hdate.Date  || c.Issd == 1) && c.State == 0) || (DateTime.Now.Date == c.Qgdate.Date && c.State > 0)) && c.Hsuid == us.Mystudioid && c.Isdelete == 0).OrderByDescending(c => c.Jprice).ToList();
                 }
               
 
@@ -391,7 +398,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     c.Zhimg,
                     banklist = _dbConnect.DbUsersBank.Where(u => u.Uid == c.Uid).ToList(),
                     hsbanklist = _dbConnect.DbUsersBank.Where(u => u.Uid == c.Hsuid).ToList()
-                }).ToList();
+                }).OrderByDescending(c=>c.Qgdate).ToList();
 
 
                 if (lx == 99)//我的订单
@@ -470,8 +477,9 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     c.Isfc,
                     c.Zrdate,
                     c.Sjjine,
+                    c.Hdate,
                     banklist = _dbConnect.DbUsersBank.Where(u => u.Uid == c.Uid).ToList()
-                }).ToList();
+                }).OrderByDescending(c=>c.Hdate).ToList();
 
                 if(state > 0 && state < 3)//我的字画(持有中)
                 {
@@ -575,7 +583,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     if (sjimg == "") { _res.Fail("请上传付款凭证"); return _res; }
                     hold.Sjimg = sjimg;
                     hold.Issj = 1;
-                    hold.Sjdate = DateTime.Now.AddDays(1);//用于判断显示大厅时间
+                    hold.Sjdate = DateTime.Now;
                     msg = "申请成功";
                 }
                 else if(lx == 1)//上架画贝支付
@@ -817,7 +825,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 List<DbHold> hlist = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Isdelete == 0).ToList();
                 if(state == 1)//待审
                 {
-                    hlist = hlist.Where(c => c.Issj == 1 && c.State == 3).ToList();
+                    hlist = hlist.Where(c => c.Issj == 1 && c.State == 3).OrderByDescending(c=>c.Sjdate).ToList();
 
                 }else if(state == 2)//未上架
                 {
@@ -826,7 +834,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 }
                 else if (state == 3)//已审
                 {
-                    hlist = hlist.Where(c => c.State == 4).ToList();
+                    hlist = hlist.Where(c => c.State == 4).OrderByDescending(c => c.Sjdate).ToList();
                 }
 
                 _res.Done(hlist, "查询成功");
@@ -864,17 +872,17 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 List<DbHold> hlist = new List<DbHold>();
                 if (state == 0)//待转画
                 {
-                    hlist = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.State == 0 && c.Isdelete == 0 && c.Isfc == 0).ToList();
+                    hlist = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.State == 0 && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c=>c.Hdate).ToList();
 
                 }
                 else if (state == 1)//转出
                 {
-                    hlist = _dbConnect.DbHold.Where(c => c.Oldhsuid == us.Id && c.Hsuid != us.Id  && c.Isdelete == 0 && c.Isfc == 0).ToList();
+                    hlist = _dbConnect.DbHold.Where(c => c.Oldhsuid == us.Id && c.Hsuid != us.Id  && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Hdate).ToList();
 
                 }
                 else if (state == 2)//转入
                 {
-                    hlist = _dbConnect.DbHold.Where(c => c.Oldhsuid != us.Id && c.Hsuid == us.Id  && c.Isdelete == 0 && c.Isfc == 0).ToList();
+                    hlist = _dbConnect.DbHold.Where(c => c.Oldhsuid != us.Id && c.Hsuid == us.Id  && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Hdate).ToList();
                 }
 
                 _res.Done(hlist, "查询成功");
@@ -1038,7 +1046,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
         }
 
         /// <summary>
-        /// 画室长业绩订单
+        /// 画室业绩订单
         /// 
         /// </summary>
         /// <returns></returns>
@@ -1055,13 +1063,22 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
 
                 DbUsers us = _dbConnect.DbUsers.FirstOrDefault(c => c.Userid.Equals(userid));
                 if (us == null) { _res.Fail("用户信息出错"); return _res; }
+                List<DbHold> holdlist = new List<DbHold>();
+                if(us.Ulevel > 0)
+                {
+                    holdlist = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id).ToList();
+                }
+                else
+                {
+                    holdlist = _dbConnect.DbHold.Where(c => c.Buid == us.Id || c.Uid == us.Id).ToList();
+                }
 
-                int jinrinum = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Hdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Count();
-                decimal jinriprice = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Hdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Sum(c => c.Jprice);
+                int jinrinum = holdlist.Where(c =>c.Buid != null && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Count();
+                decimal jinriprice = holdlist.Where(c =>  c.Buid != null && c.Qgdate.Date == DateTime.Now.Date && c.Isdelete == 0 && c.Isfc == 0).Sum(c => c.Jprice);
 
                 if (state != 99)//
                 {
-                    var hlist = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.State == state && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Qgdate).Select(c => new
+                    var hlist = holdlist.Where(c =>  c.State == state && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Qgdate).Select(c => new
                     {
                         c.Id,
                         c.Holdno,
@@ -1095,7 +1112,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 }
                 else
                 {
-                    var hlist = _dbConnect.DbHold.Where(c => c.Hsuid == us.Id && c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Qgdate).Select(c => new
+                    var hlist = holdlist.Where(c =>  c.Isdelete == 0 && c.Isfc == 0).OrderByDescending(c => c.Qgdate).Select(c => new
                     {
                         c.Id,
                         c.Holdno,
