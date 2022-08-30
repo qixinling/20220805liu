@@ -19,16 +19,17 @@
 					</template>
 				</van-count-down> -->
 			</van-col>
-		</van-row>
-		<div style="background-color: #dbdbdb;padding-top: 50px;text-align: center;" >
-			<div style="padding: 10px;font-size: 14px;" v-if="site.length > 0">
-				<span style="padding-right:10px">营业中 营业时间：{{site[1].sdate}} - {{site[1].edate}}</span>
-				
-				<van-button v-if="site[0].ispay == 1 && hsisyy == 1" size="mini"  color="#EC5624" @click="yuyue">
-					预约
-				</van-button>
+			<div style="background-color: #dbdbdb;text-align: center;position: fixed;left: 0;right: 0;margin-top: 32px;">
+				<div style="padding: 10px;font-size: 14px;" v-if="site.length > 0">
+					<span style="padding-right:10px">营业中 营业时间：{{site[1].sdate}} - {{site[1].edate}}</span>
+			
+					<van-button v-if="site[0].ispay == 1 && hsisyy == 1" size="mini" color="#EC5624" @click="yuyue">
+						预约
+					</van-button>
+				</div>
 			</div>
-		</div>
+		</van-row>
+		
 		<!-- <div class="fenqu-wrap" v-if="site.id == 1">
 			<div class="box">
 				<div class="label">请选择你想要预约的分区</div>
@@ -47,29 +48,31 @@
 
 		<!-- <HeadBar :title="title" :bg="'transparent'"></HeadBar> -->
 		<!--<van-list v-model="loading" :finished="finished" finished-text="没有更多了" :offset="0" :immediate-check="false" @load="onLoad"> -->
-		<div>
+		<div style="padding-top: 80px;">
 			<div style="padding: 5px 5px 60px" class="goods-content">
 				<van-row>
 					<van-col style="padding: 5px" span="8" v-for="(item, index) in data" :key="index">
-						<div  style="position:absolute;z-index:1;width:125px;">
-							<img :src="getimg(item.jimg)" style="width: 100%" />
+						<div style="position:absolute;z-index:1;width:115px;">
+							<img :src="getimg(item.jimg)" style="width:115px" />
 						</div>
 						<div v-if="item.buid" style="position:absolute;z-index:99;padding:10px;">
-								<img src="../../assets/img/zg.jpg"  style="width: 100px;" />	
-	
+							<img src="../../assets/img/zg.jpg" style="width: 95px;" />
+
 						</div>
-						<div class="goods-card"  >
-							
+						<div class="goods-card">
+
 							<div class="goods-content">
 								<div class="goodsname">{{ item.jname }}</div>
 								<div class="goodsprice">
 									<span>￥{{ item.jprice }}</span>
 								</div>
 								<div class="goodsother">
-									<van-button v-if="item.state == 0" block size="small" style="background-color:#ff4500;color:#fff" @click="qiangpai(item.id)">
+									<van-button v-if="item.state == 0" block size="small"
+										style="background-color:#ff4500;color:#fff" @click="qiangpai(item.id)">
 										抢购
 									</van-button>
-									<van-button v-if="item.state > 0" block size="small" style="background-color:#999;color:#fff" >
+									<van-button v-if="item.state > 0" block size="small"
+										style="background-color:#999;color:#fff">
 										抢购
 									</van-button>
 								</div>
@@ -129,21 +132,21 @@
 				getTime: null,
 				fenquList: [],
 				fenquIndex: 0,
-				hsisyy:0,
-				week:''
+				hsisyy: 0,
+				week: ''
 			};
 		},
 		created() {
 			this.load();
 		},
 		methods: {
-			load: function () {
-			    //登录组件登录成功后会触发该函数,刷新父窗体数据
-			    if (this.$store.state.LoginState) {
-			        //子组件调用加载
-			      this.getsite();
-			      this.getdata(this.pageIndex);
-			    }
+			load: function() {
+				//登录组件登录成功后会触发该函数,刷新父窗体数据
+				if (this.$store.state.LoginState) {
+					//子组件调用加载
+					this.getsite();
+					this.getdata(this.pageIndex);
+				}
 			},
 			tolink() {
 				this.$router.back(-1);
@@ -162,7 +165,7 @@
 			},
 			yuyue: function() {
 				this.$router.push({
-				    name: "Yuyue",
+					name: "Yuyue",
 				});
 				// //let fqid = this.fenquList[this.fenquIndex].id;
 				// let that = this
@@ -307,12 +310,12 @@
 
 <style scoped>
 	.overlay {
-	position:absolute;
-	 z-index:999;
+		position: absolute;
+		z-index: 999;
 	}
-	
+
 	.qiangpaiqu {
-		min-height: 100vh;
+		/* min-height: 100vh; */
 		/* background-color: #fff; */
 	}
 
@@ -374,7 +377,7 @@
 		left: 0;
 		right: 0;
 		background-color: #fff;
-		z-index: 9;
+		z-index: 100;
 		border-bottom: 1px solid rgba(209, 208, 208, 0.3);
 	}
 
@@ -408,7 +411,7 @@
 	}
 
 	.goodsname {
-		/* height: 38px; */
+		height: 38px;
 		margin-bottom: 4px;
 		font-size: 12px;
 		font-weight: 600;

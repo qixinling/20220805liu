@@ -583,7 +583,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     if (sjimg == "") { _res.Fail("请上传付款凭证"); return _res; }
                     hold.Sjimg = sjimg;
                     hold.Issj = 1;
-                    hold.Sjdate = DateTime.Now;
+                    
                     msg = "申请成功";
                 }
                 else if(lx == 1)//上架画贝支付
@@ -750,13 +750,11 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
 
                 decimal zshouyi = hold.Jprice * 4 / 100;//新一轮打款金额打款
                 decimal zjine = hold.Jprice + zshouyi;
-
-                
-                
-
                 decimal sjjine = zjine * (decimal)2.5 / 100;
 
                 hold.State = 4;//交易结束，开始新的卖单
+                hold.Sjdate = DateTime.Now;
+
                 string Orderno = RandomUtils.GetRandom3();
                 DbHold newhold = new DbHold();
                 newhold.Holdno = Orderno;
@@ -1180,6 +1178,12 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                 decimal zjine = hold.Jprice / num;
                 decimal sjjine = hold.Sjjine / num;
                 decimal zshouyi = hold.Zshouyi / num;
+
+                DateTime hdate = DateTime.Now;
+                if(DateTime.Now.Date > hold.Hdate.Date)
+                {
+                    hdate = hold.Sjdate;
+                }
                 for (int i = 0; i < num; i++)
                 {
                     string Orderno = RandomUtils.GetRandom3();
