@@ -139,7 +139,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                             Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, _dbConnect);
                             if (res.Code == 0) { break; }
                             IBill bill = new BillPay();
-                            bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, _dbConnect, "冻结", 0);
+                            bill.Create(us.Id, new Dictionary<int, decimal> { { 1, 0-yajin } }, _dbConnect, "冻结", 0);
 
                             res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
                             bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, _dbConnect, "冻结", 0);
@@ -264,7 +264,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                             Result res = WalletsUtils.PayBalance(uw.Uid, uw.Cid, yajin, dbConnect);
                             if (res.Code == 0) { break; }
                             IBill bill = new BillPay();
-                            bill.Create(us.Id, new Dictionary<int, decimal> { { 1, yajin } }, dbConnect, "冻结", 0);
+                            bill.Create(us.Id, new Dictionary<int, decimal> { { 1, 0-yajin } }, dbConnect, "冻结", 0);
 
                             res = WalletsUtils.UpdateBalance(uw.Uid, 3, yajin, _dbConnect);
                             bill.Create(us.Id, new Dictionary<int, decimal> { { 3, yajin } }, dbConnect, "冻结", 0);
@@ -275,7 +275,7 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     }
                     else
                     {
-                        return _res.Fail("抢购失败");
+                        return _res.Fail("抱歉！您的手太慢了，加油哦！");
                     }
                   
                 } while(true);
@@ -283,12 +283,12 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
 
                 _dbConnect.SaveChanges();
                
-                _res.Done(null, "竞拍成功，请尽快完成打款");
+                _res.Done(null, "恭喜！您抢中了心意的字画！");
 
             }
             catch (Exception ex)
             {
-                _res.Error("竞拍失败");
+                _res.Error("竞拍异常");
                 NLogHelper._.Error(_res.Msg, ex);
             }
             return _res;
@@ -595,10 +595,11 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
                     Result res = WalletsUtils.PayBalance(us.Id, 1, hold.Sjjine, _dbConnect);
                     if (res.Code == 0) { return _res.Fail(res.Msg); }
                     IBill bill = new BillPay();
-                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, hold.Sjjine } }, _dbConnect, "上架费", 0);
+                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1,0- hold.Sjjine } }, _dbConnect, "上架费", 1);
 
                     res = WalletsUtils.UpdateBalance(hold.Hsuid, 1, hold.Sjjine, _dbConnect);
-                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, hold.Sjjine } }, _dbConnect, us.Userid+"上架打款", 0);
+                    bill.Create(hold.Hsuid, new Dictionary<int, decimal> { { 1, hold.Sjjine } }, _dbConnect, us.Userid+"上架打款", 1);
+
                     if (res.Code == 0) { return _res.Fail(res.Msg); }
 
                     hold.State = 4;//交易结束，开始新的卖单
@@ -692,13 +693,16 @@ namespace Server.Api.Controllers.ShopControllers.HoldControllers
 
                 hold.State = 3;
                 hold.Skdate = DateTime.Now;
+                if(hold.Yajin > 0)
+                {
+                    Result res = WalletsUtils.PayBalance((int)hold.Uid, 3, hold.Yajin, _dbConnect);
+                    IBill bill = new BillPay();
+                    bill.Create(us.Id, new Dictionary<int, decimal> { { 3, 0-hold.Yajin } }, _dbConnect, "解冻", 0);
 
-                Result res = WalletsUtils.PayBalance((int)hold.Uid, 3, hold.Yajin, _dbConnect);
-                IBill bill = new BillPay();
-                bill.Create(us.Id, new Dictionary<int, decimal> { { 3, hold.Yajin } }, _dbConnect, "解冻", 0);
-
-                res = WalletsUtils.UpdateBalance((int)hold.Uid, 1, hold.Yajin, _dbConnect);
-                bill.Create(us.Id, new Dictionary<int, decimal> { { 1, hold.Yajin } }, _dbConnect, "解冻", 0);
+                    res = WalletsUtils.UpdateBalance((int)hold.Uid, 1, hold.Yajin, _dbConnect);
+                    bill.Create(us.Id, new Dictionary<int, decimal> { { 1, hold.Yajin } }, _dbConnect, "解冻", 0);
+                }
+                
 
                 DbUsers buyus = _dbConnect.DbUsers.FirstOrDefault(c => c.Id == hold.Buid);
 
