@@ -309,6 +309,7 @@ namespace Server.Api.Controllers.WalletsControllers.TixianController
                     }, _dbConnect,"通过"+tx.Userid+"提现");
 
                 _dbConnect.SaveChanges();
+
                 MsgUtils.Send(0, "提现", "您的提现申请:" + tx.Jine + "已通过", 0, "系统消息", tx.Uid, tx.Userid);
                 SystemLogMethod.Add(userid, HttpInfoUtils.GetIP(), 3, "审核提现:" + tx.Userid);
 
