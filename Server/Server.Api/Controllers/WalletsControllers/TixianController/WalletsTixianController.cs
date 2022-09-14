@@ -297,7 +297,7 @@ namespace Server.Api.Controllers.WalletsControllers.TixianController
 
                 tx.Fdate = DateTime.Now;
                 tx.Ispay = 1;
-                DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c=>c.Id == uid && c.Cid == tx.Cid);
+                DbWallets uw = _dbConnect.DbWallets.FirstOrDefault(c=>c.Uid == uid && c.Cid == tx.Cid);
                 Result res = WalletsUtils.UpdateBalance(uw.Uid, uw.Cid, tx.Jine, _dbConnect);
                 if (res.Code == 0) { return res; }
 
