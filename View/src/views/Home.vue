@@ -6,7 +6,7 @@
 	  <div class="bjdiv">
     
 
-	<!-- <van-notice-bar left-icon="volume-o" :text="marqueemsg" /> -->
+	
 
   <div class="order-block">
     <div class="block-title">
@@ -41,7 +41,8 @@
 	    </van-swipe-item>
 	  </van-swipe>
   </div>
-
+  <van-notice-bar left-icon="volume-o" :text="marqueemsg" />
+  
   <div class="shop-block">
     <div class="block-title">
       <van-icon name="bars" size="16" color="gray" style="margin-right:3px" />
